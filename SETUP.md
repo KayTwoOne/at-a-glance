@@ -3,9 +3,13 @@
 This guide is written to be followed even if you have never built a plugin before.
 Take it one step at a time and don't skip the "you should see" checkpoints.
 
-At a glance is a Vencord **userplugin**. That means it gets compiled into Vencord
-itself: you build Vencord from source once, and the plugin is baked into that build.
-You do **not** download an `.exe` or drag a file into Discord.
+At a glance is a **userplugin** for the Vencord client mod. That means it gets compiled
+into the client itself: you build it from source once, and the plugin is baked into that
+build. You do **not** download an `.exe` or drag a file into Discord.
+
+> **Using Equicord?** It's a fork of Vencord and works exactly the same - this plugin
+> runs on it unchanged. Wherever this guide says "Vencord", clone
+> `https://github.com/Equicord/Equicord` instead and everything else is identical.
 
 **Jump to what you need:**
 

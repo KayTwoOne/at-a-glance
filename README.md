@@ -5,7 +5,7 @@
 **A customizable overview page for Discord, one tab above your Friends button.**
 
 [![Version](https://img.shields.io/badge/version-2.6.2-D33699?style=flat-square)](CHANGELOG.md)
-[![Vencord](https://img.shields.io/badge/vencord-userplugin-9c85ef?style=flat-square)](https://vencord.dev)
+[![Vencord](https://img.shields.io/badge/vencord%20%7C%20equicord-userplugin-9c85ef?style=flat-square)](https://vencord.dev)
 [![Discord](https://img.shields.io/badge/discord-stable-57F287?style=flat-square)](#install)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
 
@@ -76,7 +76,12 @@ under **Add Widget** to get a status pill and Start / Stop / Status controls.
 
 ## Install
 
-At a glance is a **userplugin**, compiled into Vencord from source:
+At a glance is a **userplugin**, compiled into the client mod from source. It runs
+unchanged on **[Vencord](https://vencord.dev)** and its fork
+**[Equicord](https://github.com/Equicord/Equicord)** - both bundle `src/userplugins/`
+and share the same plugin APIs, so pick whichever you use.
+
+**On Vencord:**
 
 ```console
 git clone https://github.com/Vendicated/Vencord
@@ -86,10 +91,20 @@ git clone https://github.com/KayTwoOne/at-a-glance src/userplugins/atAGlance
 pnpm build && pnpm inject
 ```
 
-Quit Discord fully before `pnpm inject` (tray icon, then Quit). Afterwards enable
-**AtAGlance** under Settings → Vencord → Plugins and restart Discord once more.
+**On Equicord** (same steps, different repo):
 
-**Already running Vencord from source with your own plugins?** Just the
+```console
+git clone https://github.com/Equicord/Equicord
+cd Equicord
+pnpm install --frozen-lockfile
+git clone https://github.com/KayTwoOne/at-a-glance src/userplugins/atAGlance
+pnpm build && pnpm inject
+```
+
+Quit Discord fully before `pnpm inject` (tray icon, then Quit). Afterwards enable
+**AtAGlance** under Settings → Plugins and restart Discord once more.
+
+**Already running Vencord or Equicord from source with your own plugins?** Just the
 `git clone … src/userplugins/atAGlance` line and a rebuild. The full walkthrough,
 including multi-plugin setups, updating and troubleshooting, is in
 **[SETUP.md](SETUP.md)**.
