@@ -1,0 +1,3292 @@
+/* ========================================================================
+   At a glance - styled exclusively with Discord design tokens so default,
+   light, and Nitro custom themes all render correctly.
+   Surfaces use --background-mod-* (translucent), which is how Discord's own
+   UI stays legible over Nitro theme gradients.
+   ======================================================================== */
+
+/* ========== Sidebar tab (mirrors Friends/Shop/Quests rows) ========== */
+
+.vc-glance-tab {
+    list-style: none;
+    /* Native rows are inset pills - without this the pill touches the
+       scroller edge and reads as square against Discord's rounding */
+    margin-inline-end: 8px;
+}
+
+.vc-glance-tab-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: var(--space-8, 8px) var(--space-16, 16px) var(--space-8, 8px) 12px;
+    border-radius: var(--radius-sm, 8px);
+    color: var(--interactive-text-default, var(--channels-default, #949ba4));
+    cursor: pointer;
+}
+
+.vc-glance-tab-icon {
+    flex-shrink: 0;
+    color: var(--icon-muted, currentcolor);
+}
+
+.vc-glance-tab-pill:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 4%));
+    color: var(--interactive-text-hover, var(--interactive-hover, #dbdee1));
+}
+
+.vc-glance-tab-pill:active,
+.vc-glance-tab-selected {
+    background: var(--interactive-background-selected, var(--interactive-background-active, rgb(255 255 255 / 8%)));
+    color: var(--text-default, var(--interactive-active, #fff));
+}
+
+.vc-glance-tab-pill:active .vc-glance-tab-icon,
+.vc-glance-tab-selected .vc-glance-tab-icon {
+    color: var(--icon-strong, currentcolor);
+}
+
+.vc-glance-tab-label {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ========== Overlay: respects the server rail and the OS titlebar ========== */
+
+.vc-glance-overlay {
+    position: fixed;
+    top: var(--custom-app-top-bar-height, 0px);
+    right: 0;
+    bottom: 0;
+    left: var(--custom-guild-list-width, 72px);
+    /* Above Discord's sidebar resize handle (z-index 101) so it can't be
+       grabbed through the page; still below Discord's popouts/modals/titlebar */
+    z-index: 150;
+    display: flex;
+}
+
+.vc-glance-layer {
+    flex: 1;
+    display: flex;
+    min-width: 0;
+    background: var(--custom-theme-background, var(--background-base-low, var(--background-primary, #26262b)));
+    color: var(--text-default, var(--text-normal, #dbdee1));
+    border-left: 1px solid var(--border-subtle, transparent);
+    border-top: 1px solid var(--border-subtle, transparent);
+    /* Matches the rounded page-corner of Discord's visual refresh */
+    border-top-left-radius: var(--radius-md, 8px);
+    overflow: hidden;
+}
+
+/* Blanks the native toolbar's channel contents while open (bar itself stays
+   for styling + window dragging; window buttons live in a separate strip) */
+[data-vc-glance-chrome] > * {
+    visibility: hidden !important;
+}
+
+.vc-glance-frame {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* ========== Top bar - mirrors the native "Friends" title bar ========== */
+
+.vc-glance-topbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    height: 48px;
+    padding: 0 12px 0 16px;
+    border-bottom: 1px solid var(--border-subtle, var(--background-modifier-accent, transparent));
+}
+
+/* The title is the way back out - styled as an obvious interactive pill */
+.vc-glance-topbar-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 6px 10px;
+    margin-left: -6px;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    background: transparent;
+    cursor: pointer;
+}
+
+.vc-glance-topbar-back:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 6%));
+}
+
+.vc-glance-topbar-back:hover .vc-glance-topbar-icon {
+    color: var(--text-default, #f2f3f5);
+}
+
+.vc-glance-topbar-icon {
+    color: var(--icon-muted, #80848e);
+}
+
+.vc-glance-topbar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-default, #f2f3f5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.vc-glance-topbar-close {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* ========== Scroll container + workspace ========== */
+
+.vc-glance-scroll {
+    flex: 1;
+    overflow: hidden auto;
+    padding: 20px 24px 48px;
+}
+
+.vc-glance-workspace {
+    display: grid;
+    grid-template-columns: minmax(400px, 5fr) minmax(340px, 4fr);
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .vc-glance-workspace {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Widgets fade+rise in with a gentle stagger when the view opens */
+.vc-glance-widget-slot {
+    animation: vc-glance-widget-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.vc-glance-column-social .vc-glance-widget-slot:nth-child(2) { animation-delay: 0.04s; }
+.vc-glance-column-social .vc-glance-widget-slot:nth-child(3) { animation-delay: 0.08s; }
+.vc-glance-column-social .vc-glance-widget-slot:nth-child(4) { animation-delay: 0.12s; }
+.vc-glance-column-social .vc-glance-widget-slot:nth-child(5) { animation-delay: 0.16s; }
+.vc-glance-column-tools .vc-glance-widget-slot:nth-child(2) { animation-delay: 0.06s; }
+.vc-glance-column-tools .vc-glance-widget-slot:nth-child(3) { animation-delay: 0.1s; }
+.vc-glance-column-tools .vc-glance-widget-slot:nth-child(4) { animation-delay: 0.14s; }
+.vc-glance-column-tools .vc-glance-widget-slot:nth-child(5) { animation-delay: 0.18s; }
+
+@keyframes vc-glance-widget-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body.vc-glance-dragging .vc-glance-widget-slot {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-widget-slot {
+        animation: none;
+    }
+}
+
+/* ========== Greeting hero ========== */
+
+.vc-glance-hero {
+    position: relative;
+    margin-bottom: 22px;
+    padding: 22px 24px;
+    border-radius: var(--radius-md, 16px);
+    border: 1px solid var(--border-subtle, transparent);
+    background: var(--background-mod-subtle, rgb(255 255 255 / 3%));
+    overflow: hidden;
+    animation: vc-glance-widget-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Aurora: two slow drifting blobs tinted by the user's accent colours */
+.vc-glance-hero-aurora {
+    position: absolute;
+    inset: -40%;
+    pointer-events: none;
+    background:
+        radial-gradient(40% 55% at 20% 30%, color-mix(in srgb, var(--vcg-primary, #5865f2) 40%, transparent), transparent 70%),
+        radial-gradient(45% 60% at 80% 60%, color-mix(in srgb, var(--vcg-accent, #00a8fc) 35%, transparent), transparent 70%);
+    filter: blur(30px);
+    opacity: 0.55;
+    animation: vc-glance-aurora 18s ease-in-out infinite alternate;
+}
+
+@keyframes vc-glance-aurora {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(4%, -3%) scale(1.08); }
+    100% { transform: translate(-3%, 4%) scale(1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-hero,
+    .vc-glance-hero-aurora {
+        animation: none;
+    }
+}
+
+.vc-glance-hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.vc-glance-hero-greeting {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-default, #f2f3f5);
+    letter-spacing: -0.01em;
+}
+
+.vc-glance-hero-name {
+    background: linear-gradient(90deg, var(--vcg-primary, #5865f2), var(--vcg-accent, #00a8fc));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Custom name colour (Customization → Name colour): unbind the greeting name
+   from the primary/accent gradient so it can't blend into the chosen theme */
+.vc-glance-custom-name .vc-glance-hero-name {
+    background: none;
+    -webkit-text-fill-color: var(--vcg-name, #fff);
+    color: var(--vcg-name, #fff);
+}
+
+.vc-glance-hero-summary {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-hero-summary-active {
+    color: var(--text-default, #dbdee1);
+    font-weight: 500;
+}
+
+.vc-glance-hero-side {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.vc-glance-hero-clock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.2;
+}
+
+.vc-glance-hero-time {
+    font-size: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-default, #f2f3f5);
+}
+
+.vc-glance-hero-date {
+    font-size: 12px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-hero-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-strong, rgb(0 0 0 / 25%));
+    color: var(--text-muted, #949ba4);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.vc-glance-hero-search:hover {
+    border-color: var(--brand-500, #5865f2);
+    color: var(--text-default, #dbdee1);
+}
+
+/* ========== Command palette ========== */
+
+.vc-glance-palette-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 120;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 12vh;
+    background: rgb(0 0 0 / 45%);
+    backdrop-filter: blur(2px);
+    animation: vc-glance-fade-in 0.12s ease-out;
+}
+
+.vc-glance-palette {
+    width: min(560px, 90%);
+    border-radius: var(--radius-md, 12px);
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    background: var(--background-base-low, var(--background-primary, #26262b));
+    box-shadow: 0 24px 60px rgb(0 0 0 / 55%);
+    overflow: hidden;
+    animation: vc-glance-palette-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes vc-glance-palette-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes vc-glance-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-palette-backdrop,
+    .vc-glance-palette {
+        animation: none;
+    }
+}
+
+.vc-glance-palette-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border-bottom: 1px solid var(--border-subtle, rgb(255 255 255 / 6%));
+}
+
+.vc-glance-palette-input {
+    flex: 1;
+    padding: 14px 0;
+    border: none;
+    background: none;
+    color: var(--text-default, #f2f3f5);
+    font-size: 16px;
+    outline: none;
+}
+
+.vc-glance-palette-kbd,
+.vc-glance-hero-search .vc-glance-palette-kbd {
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 12%));
+    background: var(--background-mod-subtle, rgb(255 255 255 / 6%));
+    color: var(--text-muted, #949ba4);
+    font-size: 11px;
+    font-family: inherit;
+}
+
+.vc-glance-palette-results {
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 6px;
+}
+
+.vc-glance-palette-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted, #949ba4);
+    font-size: 14px;
+}
+
+.vc-glance-palette-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    background: transparent;
+    color: var(--text-default, #dbdee1);
+    text-align: left;
+    cursor: pointer;
+}
+
+.vc-glance-palette-item-active {
+    background: var(--brand-500, #5865f2);
+    color: #fff;
+}
+
+.vc-glance-palette-item-icon {
+    display: flex;
+    flex-shrink: 0;
+    color: currentcolor;
+    opacity: 0.85;
+}
+
+.vc-glance-palette-item-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.vc-glance-palette-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-palette-item-subtitle {
+    font-size: 12px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ========== Themed dropdown (replaces native <select>) ========== */
+
+.vc-glance-dropdown {
+    position: relative;
+    outline: none;
+}
+
+.vc-glance-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border-subtle, transparent);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, var(--background-secondary, #1e1f22));
+    color: var(--text-default, #dbdee1);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.vc-glance-dropdown:focus .vc-glance-dropdown-trigger,
+.vc-glance-dropdown-trigger:hover {
+    border-color: var(--brand-500, #5865f2);
+}
+
+.vc-glance-dropdown-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-dropdown-caret {
+    flex-shrink: 0;
+    color: var(--icon-muted, #949ba4);
+    transform: rotate(90deg);
+    transition: transform 0.15s ease;
+}
+
+.vc-glance-dropdown-caret-open {
+    transform: rotate(-90deg);
+}
+
+.vc-glance-dropdown-menu {
+    position: fixed;
+    /* top/left/width set inline from the trigger rect; fixed + high z-index
+       escapes the widget card's overflow/stacking so it never clips under the
+       widgets below */
+    z-index: 1000;
+    padding: 4px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    background: var(--background-base-lower, var(--background-floating, #111214));
+    box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+    max-height: 240px;
+    overflow-y: auto;
+    animation: vc-glance-palette-in 0.12s ease-out;
+}
+
+.vc-glance-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-default, #dbdee1);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.vc-glance-dropdown-item-active {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+}
+
+.vc-glance-dropdown-item-selected {
+    color: var(--text-default, #fff);
+    font-weight: 600;
+}
+
+.vc-glance-dropdown-item-selected.vc-glance-dropdown-item-active,
+.vc-glance-dropdown-item-active.vc-glance-dropdown-item-selected {
+    background: var(--brand-500, #5865f2);
+    color: #fff;
+}
+
+/* ========== Weather forecast strip ========== */
+
+.vc-glance-forecast {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.vc-glance-forecast-day {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    border-radius: var(--radius-sm, 6px);
+    background: var(--background-mod-subtle, rgb(255 255 255 / 4%));
+}
+
+.vc-glance-forecast-label {
+    font-size: 11px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-forecast-emoji {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.vc-glance-forecast-temp {
+    display: flex;
+    gap: 4px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.vc-glance-forecast-hi {
+    color: var(--text-default, #dbdee1);
+    font-weight: 600;
+}
+
+.vc-glance-forecast-lo {
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+.vc-glance-column-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted, #949ba4);
+}
+
+/* ========== Widget cards ========== */
+
+.vc-glance-card {
+    background: var(--background-mod-subtle, var(--background-secondary, #2b2d31));
+    border: 1px solid var(--border-subtle, transparent);
+    border-radius: var(--radius-md, 12px);
+}
+
+.vc-glance-card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 12px 10px 8px;
+}
+
+.vc-glance-card-collapsed .vc-glance-card-header {
+    padding-bottom: 12px;
+}
+
+.vc-glance-card-collapse {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--icon-muted, #80848e);
+    cursor: pointer;
+}
+
+.vc-glance-card-collapse:hover {
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-card-grip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 24px;
+    border-radius: var(--radius-sm, 6px);
+    color: var(--icon-muted, #80848e);
+    cursor: grab;
+    touch-action: none;
+}
+
+.vc-glance-card-grip:hover {
+    color: var(--text-default, #dbdee1);
+    background: var(--interactive-background-hover, rgb(255 255 255 / 6%));
+}
+
+/* ========== Drag & drop ========== */
+
+body.vc-glance-dragging,
+body.vc-glance-dragging * {
+    cursor: grabbing !important;
+    user-select: none !important;
+}
+
+.vc-glance-widget-slot {
+    min-width: 0;
+}
+
+/* Where the widget came from / will land - the dotted outline */
+.vc-glance-drop-slot {
+    border: 2px dashed var(--border-strong, rgb(255 255 255 / 20%));
+    border-radius: var(--radius-md, 12px);
+    background: var(--background-mod-subtle, rgb(255 255 255 / 3%));
+    box-sizing: border-box;
+}
+
+.vc-glance-drag-ghost {
+    position: fixed;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0.95;
+    transform: rotate(1.2deg) scale(1.01);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 50%);
+    border-radius: var(--radius-md, 12px);
+}
+
+.vc-glance-drag-ghost.vc-glance-no-motion {
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-drag-ghost {
+        transform: none;
+    }
+}
+
+.vc-glance-chevron {
+    transition: transform 0.15s ease;
+}
+
+.vc-glance-card:not(.vc-glance-card-collapsed) .vc-glance-card-collapse .vc-glance-chevron,
+.vc-glance-chevron-open {
+    transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-chevron {
+        transition: none;
+    }
+}
+
+.vc-glance-card-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-default, #f2f3f5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    user-select: none;
+}
+
+.vc-glance-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vc-glance-card-body {
+    padding: 0 12px 12px;
+}
+
+.vc-glance-subcard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-strong, var(--background-tertiary, #1e1f22));
+}
+
+.vc-glance-subcard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.vc-glance-subcard-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vc-glance-empty {
+    padding: 14px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-strong, rgb(0 0 0 / 30%));
+    color: var(--text-muted, #949ba4);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.vc-glance-hint {
+    color: var(--text-muted, #949ba4);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* ========== Shared list rows ========== */
+
+.vc-glance-row-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vc-glance-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-strong, var(--background-tertiary, #1e1f22));
+    cursor: pointer;
+}
+
+.vc-glance-row:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 6%));
+}
+
+.vc-glance-row-offline,
+.vc-glance-row-dimmed {
+    opacity: 0.55;
+}
+
+.vc-glance-row-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.vc-glance-row-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-default, #dbdee1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-row-subtitle {
+    font-size: 12px;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Native "unread" whitening */
+.vc-glance-row-unread .vc-glance-row-title {
+    color: var(--interactive-text-active, var(--interactive-active, #fff));
+    font-weight: 600;
+}
+
+.vc-glance-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ---- Pinned Friends: two-column grid ----
+   Each tile keeps the normal row shape (avatar + info left, actions pushed to
+   the right edge), just at half width - 2 friends per row, so twice as many fit
+   in the same vertical space. */
+.vc-glance-friends-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+/* min-width:0 lets the name/activity text ellipsize inside the half-width cell
+   instead of blowing the column open */
+.vc-glance-friend-cell,
+.vc-glance-friend-tile {
+    min-width: 0;
+}
+
+.vc-glance-friend-tile .vc-glance-icon-button {
+    width: 28px;
+    height: 28px;
+}
+
+/* ---- Row drag & drop (friends / server sections): the widget-drag look at
+   row scale - dashed landing slot + floating ghost following the cursor ---- */
+
+.vc-glance-row-drop-slot {
+    border-radius: var(--radius-sm, 8px);
+    min-width: 0;
+}
+
+.vc-glance-drag-ghost.vc-glance-row-ghost {
+    transform: rotate(0.8deg) scale(1.02);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 45%);
+    border-radius: var(--radius-sm, 8px);
+}
+
+.vc-glance-drag-ghost.vc-glance-row-ghost.vc-glance-no-motion {
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-drag-ghost.vc-glance-row-ghost {
+        transform: none;
+    }
+}
+
+.vc-glance-icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--icon-muted, #b5bac1);
+    cursor: pointer;
+}
+
+.vc-glance-icon-button:hover:not(:disabled) {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+    color: var(--text-default, #fff);
+}
+
+.vc-glance-icon-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ========== Avatars, status, badges ========== */
+
+.vc-glance-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+}
+
+.vc-glance-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.vc-glance-avatar-placeholder {
+    background: var(--background-mod-strong, #313338);
+}
+
+.vc-glance-status {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid var(--background-base-lower, #1e1f22);
+    background: var(--status-offline, #80848e);
+    box-sizing: content-box;
+}
+
+.vc-glance-status-online { background: var(--status-online, #23a55a); }
+.vc-glance-status-idle { background: var(--status-idle, #f0b232); }
+.vc-glance-status-dnd { background: var(--status-dnd, var(--status-danger, #f23f43)); }
+
+.vc-glance-badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 5px;
+    border-radius: 8px;
+    background: var(--status-danger, #f23f43);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+
+.vc-glance-unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--interactive-text-active, var(--interactive-active, #fff));
+}
+
+/* ========== Quick Access: per-server (collapsible) grouping ========== */
+
+.vc-glance-guild-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-glance-guild-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: var(--radius-sm, 8px);
+    cursor: pointer;
+    user-select: none;
+}
+
+.vc-glance-guild-header:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 5%));
+}
+
+.vc-glance-guild-header-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--radius-sm, 7px);
+    object-fit: cover;
+}
+
+.vc-glance-guild-header-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-guild-header-count {
+    flex-shrink: 0;
+    min-width: 18px;
+    padding: 1px 6px;
+    border-radius: 9px;
+    background: var(--background-mod-subtle, rgb(255 255 255 / 6%));
+    color: var(--text-muted, #949ba4);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.vc-glance-guild-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    padding-left: 6px;
+}
+
+.vc-glance-guild-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm, 8px);
+    object-fit: cover;
+}
+
+.vc-glance-guild-icon-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-mod-subtle, #313338);
+    color: var(--text-muted, #949ba4);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.vc-glance-channel-type-icon {
+    flex-shrink: 0;
+    color: var(--icon-muted, #80848e);
+}
+
+.vc-glance-row-live .vc-glance-channel-type-icon {
+    color: var(--status-online, #23a55a);
+}
+
+.vc-glance-voice-row .vc-glance-chevron {
+    flex-shrink: 0;
+    color: var(--icon-muted, #80848e);
+}
+
+.vc-glance-voice-occupancy {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vc-glance-voice-avatars {
+    display: flex;
+}
+
+.vc-glance-voice-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--background-base-lower, #1e1f22);
+    object-fit: cover;
+}
+
+.vc-glance-voice-avatar:not(:first-child) {
+    margin-left: -7px;
+}
+
+.vc-glance-voice-count {
+    color: var(--status-online, #23a55a);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Expanded occupant list - mirrors the guild-hover voice popout */
+.vc-glance-occupant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 2px 0 4px 32px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, rgb(0 0 0 / 20%));
+}
+
+.vc-glance-occupant {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 4px;
+    border-radius: 4px;
+}
+
+.vc-glance-occupant-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.vc-glance-occupant-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    color: var(--text-default, #dbdee1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-occupant-flags {
+    display: flex;
+    gap: 4px;
+    color: var(--status-danger, #f23f43);
+}
+
+/* ========== Buttons & inputs ========== */
+
+.vc-glance-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    color: #fff;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+
+.vc-glance-button:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+.vc-glance-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.vc-glance-button-brand {
+    background: var(--brand-500, #5865f2);
+}
+
+.vc-glance-button-danger {
+    background: var(--status-danger, #f23f43);
+}
+
+.vc-glance-link-button {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text-link, #00a8fc);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.vc-glance-link-button:hover {
+    text-decoration: underline;
+}
+
+.vc-glance-input {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 10px;
+    border: 1px solid var(--border-subtle, transparent);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, var(--background-secondary, #1e1f22));
+    color: var(--text-default, #dbdee1);
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.vc-glance-input:focus {
+    outline: none;
+    border-color: var(--brand-500, #5865f2);
+}
+
+/* ========== Quick Tools ========== */
+
+.vc-glance-tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.vc-glance-tools-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.vc-glance-clock-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vc-glance-clock-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.vc-glance-clock-zone {
+    font-size: 13px;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-clock-time {
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-tool-display {
+    font-size: 24px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--text-default, #f2f3f5);
+    padding: 4px 0;
+}
+
+.vc-glance-tool-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.vc-glance-timer-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vc-glance-timer-input {
+    flex: 1;
+    width: 0;
+    text-align: center;
+}
+
+.vc-glance-timer-sep {
+    color: var(--text-muted, #949ba4);
+    font-weight: 600;
+}
+
+.vc-glance-calc-display {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, rgb(0 0 0 / 30%));
+    color: var(--text-default, #f2f3f5);
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.vc-glance-calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.vc-glance-calc-key {
+    padding: 9px 0;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: var(--background-mod-subtle, rgb(255 255 255 / 5%));
+    color: var(--text-default, #dbdee1);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.vc-glance-calc-key:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 10%));
+}
+
+.vc-glance-calc-key-op {
+    color: var(--brand-500, #5865f2);
+}
+
+.vc-glance-calc-key-equals {
+    grid-column: span 4;
+    background: var(--brand-500, #5865f2);
+    color: #fff;
+}
+
+.vc-glance-calc-key-equals:hover {
+    filter: brightness(1.1);
+    background: var(--brand-500, #5865f2);
+}
+
+/* ========== Integrations ========== */
+
+.vc-glance-weather-search {
+    display: flex;
+    gap: 8px;
+}
+
+.vc-glance-weather-results {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vc-glance-weather-result {
+    padding: 8px 10px;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--text-default, #dbdee1);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.vc-glance-weather-result:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 6%));
+}
+
+.vc-glance-weather-now {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vc-glance-weather-emoji {
+    font-size: 26px;
+    line-height: 1;
+}
+
+.vc-glance-spotify-now {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vc-glance-spotify-art {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm, 6px);
+    object-fit: cover;
+}
+
+.vc-glance-spotify-art-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-mod-subtle, #313338);
+    color: var(--icon-muted, #80848e);
+}
+
+.vc-glance-spotify-idle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--icon-muted, #80848e);
+}
+
+.vc-glance-spotify-progress {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--background-mod-subtle, rgb(255 255 255 / 10%));
+    overflow: hidden;
+}
+
+.vc-glance-spotify-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--brand-500, #5865f2);
+}
+
+.vc-glance-notes {
+    width: 100%;
+    min-height: 88px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-subtle, transparent);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, rgb(0 0 0 / 25%));
+    color: var(--text-default, #dbdee1);
+    font-size: 13px;
+    font-family: inherit;
+    line-height: 1.45;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.vc-glance-notes:focus {
+    outline: none;
+    border-color: var(--brand-500, #5865f2);
+}
+
+/* ========== Client performance ========== */
+
+.vc-glance-perf-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-glance-perf-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.vc-glance-perf-label {
+    font-size: 13px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-perf-value {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-perf-warn {
+    color: var(--status-danger, #f23f43);
+}
+
+.vc-glance-perf-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--background-mod-strong, rgb(0 0 0 / 30%));
+    overflow: hidden;
+}
+
+.vc-glance-perf-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--status-online, #23a55a);
+}
+
+/* ========== Rail user strip (vertical user panel under the server list) ========== */
+
+/* Discord's own bottom-left user panel (and the game-activity chip inside it)
+   is hidden outright while At a glance is open - our strip replaces it, and
+   with the strip now TRANSPARENT nothing may linger behind it. */
+body[data-vc-glance-open] [class^="panels_"],
+body[data-vc-glance-open] [class*=" panels_"] {
+    visibility: hidden !important;
+}
+
+.vc-glance-rail-strip {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    /* Above the sidebar resize handle (101); still well below Discord's real
+       popouts/tooltips (1000+) so those aren't covered. */
+    z-index: 120;
+    width: var(--custom-guild-list-width, 72px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Transparent: the theme's own sidebar shows through, and the nameplate
+       (below) fades up into it - no box edges against gradient themes. */
+    background: transparent;
+}
+
+/* ---- Full-bleed user area: the nameplate wraps the WHOLE bottom-left strip,
+   flush to the edges, fading out ~5px from its top so it melts upward into the
+   sidebar instead of sitting in a rounded card. ---- */
+
+.vc-glance-rail-panel {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    /* Head-room above the avatar so the fade has art to dissolve */
+    padding: 34px 0 10px;
+}
+
+.vc-glance-rail-plate {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    /* Fully transparent at the very top, art starts appearing ~5px down and is
+       fully opaque by ~48px - the "fades upward into the side panel" line */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 5px, black 48px);
+    mask-image: linear-gradient(to bottom, transparent 5px, black 48px);
+}
+
+.vc-glance-rail-plate-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+}
+
+/* Scrim keeps the avatar + controls legible over the nameplate art */
+.vc-glance-rail-plate-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 8%), rgb(0 0 0 / 38%));
+}
+
+.vc-glance-rail-panel-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.vc-glance-rail-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.vc-glance-rail-avatar-button {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.vc-glance-rail-avatar {
+    width: 32px;
+    height: 32px;
+}
+
+.vc-glance-rail-avatar .vc-glance-status {
+    border-color: var(--custom-theme-background, var(--background-tertiary, #1a1a1e));
+    width: 10px;
+    height: 10px;
+}
+
+.vc-glance-rail-panel-plated .vc-glance-rail-avatar .vc-glance-status {
+    border-color: rgb(0 0 0 / 45%);
+}
+
+.vc-glance-rail-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 32px;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    background: transparent;
+    color: var(--interactive-normal, var(--icon-muted, #b5bac1));
+    cursor: pointer;
+}
+
+.vc-glance-rail-button:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+    color: var(--text-default, #fff);
+}
+
+.vc-glance-rail-button-danger {
+    color: var(--status-danger, #f23f43);
+}
+
+/* ========== Text channel popup ==========
+   Rendered inside our own (transform-free) layer via a flex-centred backdrop, so
+   it lands dead-centre of the viewport - no Discord modal, no position:fixed
+   trap. Input bar follows the user's primary/accent (--vcg-* come from the
+   .vc-glance-layer ancestor; --channeltextarea-background is Discord's own chat
+   input pill var, retinted and scoped to this popup). */
+
+.vc-glance-popup-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 45%);
+    backdrop-filter: blur(2px);
+    animation: vc-glance-fade-in 0.12s ease-out;
+}
+
+.vc-glance-popup {
+    display: flex;
+    flex-direction: column;
+    width: min(852px, 94vw);
+    height: min(840px, 82vh);
+    border: 1px solid var(--border-subtle, transparent);
+    border-radius: var(--radius-md, 12px);
+    background: var(--background-base-low, var(--background-primary, #26262b));
+    color: var(--text-default, #dbdee1);
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgb(0 0 0 / 55%);
+    animation: vc-glance-pop 0.16s ease-out;
+
+    --channeltextarea-background: color-mix(in srgb,
+        color-mix(in srgb, var(--vcg-primary, #5865f2), var(--vcg-accent, #00a8fc)) 22%,
+        var(--background-secondary, #2b2d31));
+}
+
+.vc-glance-popup .vc-glance-composer-input {
+    background: color-mix(in srgb,
+        color-mix(in srgb, var(--vcg-primary, #5865f2), var(--vcg-accent, #00a8fc)) 18%,
+        var(--background-mod-subtle, rgb(255 255 255 / 5%)));
+}
+
+/* Title bar */
+.vc-glance-popup-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-subtle, rgb(255 255 255 / 6%));
+}
+
+.vc-glance-popup-titles {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.vc-glance-popup-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-default, #f2f3f5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-popup-subtitle {
+    font-size: 12px;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.vc-glance-popup-close {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+}
+
+/* Hosts the scroll area + the floating "n new messages" bar over its bottom */
+.vc-glance-popup-scrollwrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollable message area (fills remaining height). No row gap - message
+   spacing is owned by the grouping rules so bursts pack like the native list */
+.vc-glance-popup-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 14px 4px;
+}
+
+/* Native-style "n new messages" bar, docked to the bottom of the chat while
+   you're scrolled up; clicking it jumps to the latest */
+.vc-glance-newbar {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 0;
+    z-index: 3;
+    padding: 5px 12px;
+    border: none;
+    border-radius: var(--radius-sm, 8px) var(--radius-sm, 8px) 0 0;
+    background: var(--vcg-accent, var(--brand-500, #5865f2));
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.vc-glance-newbar:hover {
+    filter: brightness(1.08);
+}
+
+/* Composer footer, pinned at the bottom. position:relative is load-bearing:
+   the GIF/emoji/sticker picker renders into an absolutely-positioned layer
+   anchored to the nearest positioned ancestor - without this it anchors to the
+   fixed full-screen backdrop and "bottom: 100%" puts it above the viewport,
+   i.e. the picker opens invisibly off-screen. */
+.vc-glance-popup-footer {
+    position: relative;
+    flex-shrink: 0;
+    padding: 8px 14px 12px;
+}
+
+@keyframes vc-glance-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Both the OS-level setting and Discord's own reduced-motion setting */
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-popup {
+        animation: none;
+    }
+}
+
+.vc-glance-no-motion {
+    animation: none;
+}
+
+.vc-glance-popup-banner {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding: 6px 6px 6px 10px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-strong, rgb(0 0 0 / 45%));
+    backdrop-filter: blur(8px);
+}
+
+.vc-glance-goto {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 5px 10px;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--text-muted, #b5bac1);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.vc-glance-goto:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+    color: var(--text-default, #fff);
+}
+
+.vc-glance-popup-loading {
+    margin: auto;
+}
+
+.vc-glance-msg {
+    padding: 1px 0;
+}
+
+.vc-glance-msg-grouped {
+    margin-top: 10px;
+}
+
+.vc-glance-msg-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.vc-glance-msg-avatar {
+    align-self: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.vc-glance-msg-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-default, #f2f3f5);
+}
+
+.vc-glance-msg-time {
+    font-size: 11px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-msg-content {
+    padding-left: 32px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-default, #dbdee1);
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+
+.vc-glance-msg-attachments {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.vc-glance-msg-image {
+    max-width: 280px;
+    max-height: 180px;
+    border-radius: var(--radius-sm, 6px);
+    object-fit: contain;
+}
+
+.vc-glance-msg-file {
+    font-size: 13px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-popup-composer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.vc-glance-customize-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 4px;
+}
+
+.vc-glance-composer-input {
+    flex: 1;
+    min-width: 0;
+    max-height: 96px;
+    padding: 9px 12px;
+    border: 1px solid var(--border-subtle, transparent);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, rgb(255 255 255 / 5%));
+    color: var(--text-default, #dbdee1);
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.35;
+    resize: none;
+}
+
+.vc-glance-composer-input:focus {
+    outline: none;
+    border-color: var(--brand-500, #5865f2);
+}
+
+.vc-glance-composer-send {
+    width: 36px;
+    height: 36px;
+    color: var(--brand-500, #5865f2);
+}
+
+/* ========== Prompt modal (notes / nicknames) ========== */
+
+.vc-glance-prompt-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ========================================================================
+   Materials & colour customization
+   Tint strength comes from --vcg-tint / --vcg-tint-soft (intensity slider,
+   capped at 45% so 100% stays tasteful); --vcg-angle drives gradient/shine
+   direction; --vcg-primary / --vcg-accent are the user's colours.
+   ======================================================================== */
+
+/* --- colour tint: applies in every material --- */
+
+.vc-glance-material-classic .vc-glance-card,
+.vc-glance-material-classic.vc-glance-popup {
+    background:
+        linear-gradient(var(--vcg-angle, 135deg),
+            color-mix(in srgb, var(--vcg-primary, #5865f2) var(--vcg-tint, 0%), transparent),
+            color-mix(in srgb, var(--vcg-accent, #00a8fc) var(--vcg-tint-soft, 0%), transparent)),
+        var(--background-mod-subtle, var(--background-secondary, #2b2d31));
+}
+
+.vc-glance-material-classic.vc-glance-popup {
+    background:
+        linear-gradient(var(--vcg-angle, 135deg),
+            color-mix(in srgb, var(--vcg-primary, #5865f2) var(--vcg-tint, 0%), transparent),
+            color-mix(in srgb, var(--vcg-accent, #00a8fc) var(--vcg-tint-soft, 0%), transparent)),
+        var(--background-base-low, var(--background-primary, #26262b));
+}
+
+/* --- acrylic: frosted, blurs whatever is behind (Nitro gradients shine) --- */
+
+.vc-glance-material-acrylic .vc-glance-card,
+.vc-glance-material-acrylic.vc-glance-popup {
+    background:
+        linear-gradient(var(--vcg-angle, 135deg),
+            color-mix(in srgb, var(--vcg-primary, #5865f2) var(--vcg-tint, 0%), transparent),
+            color-mix(in srgb, var(--vcg-accent, #00a8fc) var(--vcg-tint-soft, 0%), transparent)),
+        color-mix(in srgb, var(--background-base-lower, #1e1f22) 62%, transparent);
+    backdrop-filter: blur(22px) saturate(1.4);
+    border-color: rgb(255 255 255 / 7%);
+}
+
+.vc-glance-material-acrylic .vc-glance-subcard,
+.vc-glance-material-acrylic .vc-glance-row,
+.vc-glance-material-acrylic .vc-glance-occupant-list {
+    background: rgb(0 0 0 / 26%);
+}
+
+.vc-glance-material-acrylic .vc-glance-row:hover {
+    background: rgb(255 255 255 / 7%);
+}
+
+/* --- glass: clearer, with a directional specular shine --- */
+
+.vc-glance-material-glass .vc-glance-card,
+.vc-glance-material-glass.vc-glance-popup {
+    background:
+        linear-gradient(var(--vcg-angle, 135deg),
+            rgb(255 255 255 / 10%),
+            rgb(255 255 255 / 2%) 42%,
+            transparent 60%),
+        linear-gradient(var(--vcg-angle, 135deg),
+            color-mix(in srgb, var(--vcg-primary, #5865f2) var(--vcg-tint, 0%), transparent),
+            color-mix(in srgb, var(--vcg-accent, #00a8fc) var(--vcg-tint-soft, 0%), transparent)),
+        color-mix(in srgb, var(--background-base-low, #26262b) 40%, transparent);
+    backdrop-filter: blur(14px) saturate(1.2);
+    border-color: color-mix(in srgb, var(--vcg-accent, #00a8fc) calc(var(--vcg-tint, 0%) + 8%), rgb(255 255 255 / 10%));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%);
+}
+
+.vc-glance-material-glass .vc-glance-subcard,
+.vc-glance-material-glass .vc-glance-row,
+.vc-glance-material-glass .vc-glance-occupant-list {
+    background: rgb(255 255 255 / 4%);
+}
+
+.vc-glance-material-glass .vc-glance-row:hover {
+    background: rgb(255 255 255 / 9%);
+}
+
+/* ========== Customization panel ========== */
+
+.vc-glance-customize-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-glance-customize-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-segmented {
+    display: flex;
+    gap: 4px;
+    padding: 3px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-strong, rgb(0 0 0 / 30%));
+}
+
+.vc-glance-segment {
+    flex: 1;
+    padding: 7px 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted, #949ba4);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.vc-glance-segment:hover {
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-segment-active {
+    background: var(--background-mod-subtle, rgb(255 255 255 / 10%));
+    color: var(--text-default, #fff);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+}
+
+.vc-glance-customize-colors {
+    flex-direction: row;
+    gap: 16px;
+}
+
+.vc-glance-customize-color {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-glance-color-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-glance-color-input {
+    width: 40px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 10%));
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.vc-glance-color-input::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.vc-glance-color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.vc-glance-color-hex {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted, #949ba4);
+    text-transform: uppercase;
+}
+
+.vc-glance-customize-slider-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.vc-glance-customize-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-angle-arrow {
+    display: inline-flex;
+    color: var(--vcg-accent, var(--brand-500, #5865f2));
+}
+
+.vc-glance-slider {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    accent-color: var(--vcg-accent, var(--brand-500, #5865f2));
+}
+
+/* ========================================================================
+   Popup internals: native message rows, reply bar, inline editor
+   ======================================================================== */
+
+/* Popup width is set directly on the modal root ([role="dialog"]) from JS, so
+   no fragile size-class selector is needed here. */
+
+.vc-glance-popup-bottom {
+    height: 1px;
+    scroll-margin-top: 40px;
+}
+
+/* Native message rows inside the popup */
+.vc-glance-native-msg {
+    position: relative;
+    margin: 0 -8px;
+}
+
+/* Native same-author grouping: the first message of a burst keeps its avatar +
+   name/timestamp header; continuations hide them (the standalone message
+   component renders the header unconditionally - its groupId prop is ignored,
+   verified in Discord's message chunk). The header is a design-system Heading
+   whose h1–h6 level comes from React context, so it must be matched at ANY
+   level - that's why targeting h3 (or a mangled header_ class) silently
+   failed. Content already sits in the avatar gutter, so it stays aligned. */
+.vc-glance-msg-start {
+    /* Discord separates message groups by ~1.0625rem */
+    margin-top: 17px;
+}
+
+.vc-glance-msg-cont {
+    /* a whisker of air per line, like the native list's row padding */
+    margin-top: 3px;
+}
+
+.vc-glance-msg-cont [class*="avatar"],
+.vc-glance-msg-cont :is(h1, h2, h3, h4, h5, h6) {
+    display: none !important;
+}
+
+/* Continuations read as a plain line break. TWO boxes conspire against that:
+   our row wrapper borrows Discord's searchResult "message" class, which pads
+   every row vertically (this was the visible ~16px gap), and the standalone
+   message root inside reserves its full cozy box (min-height for the
+   avatar+header it thinks it has). Flatten both; vertical rhythm is then owned
+   entirely by our own margins - 3px per line, 17px between groups. */
+.vc-glance-native-msg {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Flatten the message root on EVERY row (the header row's own cozy bottom
+   padding made the first gap ~2px wider than the rest); the 3px continuation
+   margin is then the one true line gap, identical between all burst lines. */
+.vc-glance-native-msg > * {
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.vc-glance-msg-cont > * {
+    margin: 0 !important;
+}
+
+.vc-glance-native-composer {
+    /* relative so the expression picker's absolute layer anchors here */
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+/* ---- Reply bar: "Replying to X" above the composer (PendingReplyStore) ---- */
+.vc-glance-reply-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 12px;
+    margin-bottom: 6px;
+    border-radius: var(--radius-sm, 8px) var(--radius-sm, 8px) 0 0;
+    background: var(--background-mod-subtle, rgb(255 255 255 / 6%));
+    font-size: 13px;
+    color: var(--text-muted, #b5bac1);
+}
+
+.vc-glance-reply-bar-text strong {
+    color: var(--text-default, #f2f3f5);
+    font-weight: 600;
+}
+
+.vc-glance-reply-bar-cancel {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    font-size: 12px;
+}
+
+/* ---- Our own inline message editor ---- */
+.vc-glance-msg-editing {
+    margin: 4px -8px;
+}
+
+.vc-glance-msg-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, rgb(255 255 255 / 5%));
+    border-left: 3px solid var(--vcg-accent, var(--brand-500, #5865f2));
+}
+
+.vc-glance-msg-edit-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--vcg-accent, var(--brand-500, #949ba4));
+}
+
+.vc-glance-msg-edit-input {
+    max-height: 160px;
+    min-height: 34px;
+}
+
+.vc-glance-msg-edit-hint {
+    font-size: 11px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-linkbtn {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text-link, #00a8fc);
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.vc-glance-linkbtn:hover {
+    text-decoration: underline;
+}
+
+/* ---- Voice: live signals ---- */
+
+.vc-glance-speaking {
+    box-shadow: 0 0 0 2px var(--status-online, #23a55a);
+}
+
+.vc-glance-voice-avatar.vc-glance-streaming {
+    border-color: var(--status-danger, #f23f43);
+}
+
+.vc-glance-live-chip {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--status-danger, #f23f43);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+@keyframes vc-glance-join-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.vc-glance-occupant-joined,
+img.vc-glance-occupant-joined {
+    animation: vc-glance-join-pop 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-occupant-joined,
+    img.vc-glance-occupant-joined {
+        animation: none;
+    }
+}
+
+/* Join button appears on row hover, keeping rows quiet at rest */
+.vc-glance-join-button {
+    opacity: 0;
+    color: var(--status-online, #23a55a);
+    transition: opacity 0.12s ease;
+}
+
+.vc-glance-voice-row:hover .vc-glance-join-button,
+.vc-glance-join-button:focus-visible {
+    opacity: 1;
+}
+
+/* ---- Sidebar tab: aggregated mention badge / unread dot ---- */
+
+.vc-glance-tab-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ---- Zone accents: instant anchors for the two columns ---- */
+
+.vc-glance-column-label::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    border-radius: 50%;
+    vertical-align: 1px;
+}
+
+.vc-glance-column-social .vc-glance-column-label::before {
+    background: var(--brand-500, #5865f2);
+}
+
+.vc-glance-column-tools .vc-glance-column-label::before {
+    background: var(--status-online, #23a55a);
+}
+
+/* ---- Cards: subtle physical hover lift ---- */
+
+.vc-glance-card {
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.vc-glance-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgb(0 0 0 / 22%);
+}
+
+body.vc-glance-dragging .vc-glance-card,
+body.vc-glance-dragging .vc-glance-card:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-card,
+    .vc-glance-card:hover {
+        transition: none;
+        transform: none;
+    }
+}
+
+/* ---- Spotify: elapsed / total ---- */
+
+.vc-glance-spotify-times {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted, #949ba4);
+}
+
+/* ========================================================================
+   Inbox / Recent Mentions
+   ======================================================================== */
+
+/* ---- Inbox: category tabs (Mentions / Direct Messages) ---- */
+
+.vc-glance-inbox-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-subtle, rgb(255 255 255 / 6%));
+}
+
+.vc-glance-inbox-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    background: transparent;
+    color: var(--text-muted, #949ba4);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.vc-glance-inbox-tab:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 5%));
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-inbox-tab-active {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+    color: var(--text-default, #f2f3f5);
+}
+
+.vc-glance-inbox-tab-count {
+    min-width: 16px;
+    padding: 0 5px;
+    border-radius: 8px;
+    background: var(--status-danger, #f23f43);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.vc-glance-inbox-tab-active .vc-glance-inbox-tab-count {
+    background: var(--vcg-accent, var(--brand-500, #5865f2));
+}
+
+/* ---- Inbox / Recent Mentions ---- */
+
+.vc-glance-mention-row {
+    align-items: flex-start;
+}
+
+.vc-glance-mention-avatar {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    margin-top: 2px;
+}
+
+.vc-glance-mention-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+.vc-glance-mention-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-default, #f2f3f5);
+    white-space: nowrap;
+}
+
+.vc-glance-mention-location {
+    font-size: 11px;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-glance-mention-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text-default, #dbdee1);
+    overflow-wrap: anywhere;
+}
+
+
+/* ========================================================================
+   Widget attention badges, Reminders, Events
+   ======================================================================== */
+
+/* ---- Widget attention: badge + subtle shine sweep (works collapsed) ---- */
+
+.vc-glance-card-attention {
+    position: relative;
+    border-color: color-mix(in srgb, var(--brand-500, #5865f2) 45%, transparent);
+    overflow: hidden;
+}
+
+.vc-glance-card-attention::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg,
+        transparent 40%,
+        color-mix(in srgb, var(--brand-500, #5865f2) 12%, rgb(255 255 255 / 6%)) 50%,
+        transparent 60%);
+    background-size: 250% 100%;
+    animation: vc-glance-shine 3.2s ease-in-out infinite;
+}
+
+@keyframes vc-glance-shine {
+    0% { background-position: 130% 0; }
+    60%, 100% { background-position: -130% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-card-attention::after {
+        animation: none;
+        background: none;
+    }
+}
+
+/* ---- Reminders ---- */
+
+.vc-glance-reminder-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.vc-glance-reminder-form-row {
+    display: flex;
+    gap: 6px;
+}
+
+.vc-glance-reminder-select {
+    flex: 1;
+}
+
+.vc-glance-reminder-triggered {
+    background: color-mix(in srgb, var(--brand-500, #5865f2) 12%, var(--background-mod-strong, #1e1f22));
+    border: 1px solid color-mix(in srgb, var(--brand-500, #5865f2) 35%, transparent);
+}
+
+.vc-glance-reminder-triggered .vc-glance-row-title {
+    color: var(--interactive-text-active, #fff);
+}
+
+.vc-glance-reminder-done:hover:not(:disabled) {
+    background: var(--status-online, #23a55a);
+    color: #fff;
+}
+
+/* ---- Events ---- */
+
+.vc-glance-event-countdown {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+}
+
+.vc-glance-event-join {
+    color: var(--status-online, #23a55a);
+}
+
+.vc-glance-event-interested {
+    color: var(--brand-500, #5865f2);
+}
+
+/* ---- Incoming call on pinned friends ---- */
+
+.vc-glance-row-ringing {
+    background: color-mix(in srgb, var(--status-online, #23a55a) 10%, var(--background-mod-strong, #1e1f22));
+    border: 1px solid color-mix(in srgb, var(--status-online, #23a55a) 35%, transparent);
+}
+
+.vc-glance-row-ringing .vc-glance-row-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--interactive-text-active, #fff);
+    font-weight: 600;
+}
+
+.vc-glance-ring-icon {
+    color: var(--status-online, #23a55a);
+    animation: vc-glance-ring-jiggle 0.7s ease-in-out infinite;
+}
+
+@keyframes vc-glance-ring-jiggle {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-14deg); }
+    40% { transform: rotate(11deg); }
+    60% { transform: rotate(-8deg); }
+    80% { transform: rotate(5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-ring-icon {
+        animation: none;
+    }
+}
+
+.vc-glance-call-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    transition: filter 0.12s ease;
+}
+
+.vc-glance-call-button:hover {
+    filter: brightness(1.12);
+}
+
+.vc-glance-call-answer {
+    background: var(--status-online, #23a55a);
+}
+
+.vc-glance-call-reject {
+    background: var(--status-danger, #f23f43);
+}
+
+/* ========================================================================
+   Bookmarks, popup toolbar, notes view, timestamp builder
+   ======================================================================== */
+
+/* ---- Bookmarks: mini icons (avatar for DMs, server icon for guild msgs) ---- */
+
+.vc-glance-bookmark-row {
+    align-items: flex-start;
+}
+
+.vc-glance-bookmark-thumb {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    margin-top: 2px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.vc-glance-bookmark-thumb-guild {
+    border-radius: var(--radius-sm, 8px);
+}
+
+.vc-glance-bookmark-thumb-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-mod-subtle, #313338);
+    color: var(--text-muted, #949ba4);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* ========== Popup: formatting toolbar & NEW divider ========== */
+
+.vc-glance-fmt-bar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+.vc-glance-fmt-btn {
+    min-width: 26px;
+    height: 22px;
+    padding: 0 6px;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--text-muted, #949ba4);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-code, monospace);
+    cursor: pointer;
+}
+
+.vc-glance-fmt-btn:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+    color: var(--text-default, #fff);
+}
+
+/* ---- :emoji suggestions (our own popup; anchored above the composer) ---- */
+
+.vc-glance-emoji-suggest {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    border-radius: var(--radius-md, 8px);
+    background: var(--background-base-low, var(--background-primary, #26262b));
+    box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+}
+
+.vc-glance-emoji-suggest-title {
+    padding: 4px 8px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-emoji-suggest-title strong {
+    color: var(--text-default, #f2f3f5);
+}
+
+.vc-glance-emoji-suggest-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--text-default, #dbdee1);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.vc-glance-emoji-suggest-active {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+}
+
+.vc-glance-emoji-suggest-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.vc-glance-emoji-suggest-name {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* @member rows reuse the emoji-suggest shell: round the avatar and float the
+   secondary @username to the right */
+.vc-glance-suggest-avatar {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.vc-glance-suggest-sub {
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 8px;
+    font-size: 12px;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+}
+
+/* Role rows: a colour swatch dot in place of the avatar */
+.vc-glance-suggest-role-dot {
+    width: 12px;
+    height: 12px;
+    margin: 0 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* The red "you left off here" line, matching the real client's */
+.vc-glance-new-divider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0 2px;
+    height: 0;
+    border-top: 1px solid var(--status-danger, #f23f43);
+}
+
+.vc-glance-new-divider span {
+    margin-left: auto;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: var(--status-danger, #f23f43);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    transform: translateY(-50%);
+}
+
+/* ========== Quick Notes: structure toolbar + rendered view ========== */
+
+.vc-glance-notes-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.vc-glance-notes-tools {
+    display: flex;
+    gap: 2px;
+}
+
+.vc-glance-note-tool {
+    width: 24px;
+    height: 22px;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--text-muted, #949ba4);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.vc-glance-note-tool:hover {
+    background: var(--interactive-background-hover, rgb(255 255 255 / 8%));
+    color: var(--text-default, #fff);
+}
+
+.vc-glance-notes-view {
+    min-height: 72px;
+    padding: 6px 2px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-default, #dbdee1);
+    cursor: text;
+}
+
+.vc-glance-note-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    cursor: pointer;
+}
+
+.vc-glance-note-check input {
+    margin-top: 3px;
+    accent-color: var(--vcg-accent, var(--brand-500, #5865f2));
+    cursor: pointer;
+}
+
+.vc-glance-note-done span {
+    text-decoration: line-through;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-note-bullet {
+    padding-left: 16px;
+    position: relative;
+}
+
+.vc-glance-note-bullet::before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-note-divider {
+    margin: 6px 0;
+    border: none;
+    border-top: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+}
+
+.vc-glance-note-gap {
+    height: 8px;
+}
+
+/* ========== Quick Tools: timestamp builder ========== */
+
+/* border-box so width:100% + padding + border stays INSIDE the subcard - without
+   it these fields overhung the card's right edge by the padding+border (~22px),
+   which is what threw the whole column out of alignment. */
+.vc-glance-timestamp-when,
+.vc-glance-timestamp-preview,
+.vc-glance-timestamp-format .vc-glance-dropdown-trigger {
+    box-sizing: border-box;
+}
+
+.vc-glance-timestamp-when {
+    width: 100%;
+    color-scheme: dark;
+}
+
+.vc-glance-timestamp-out {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+}
+
+/* Styled like the inputs above it so the row reads as one aligned column */
+.vc-glance-timestamp-preview {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    padding: 7px 10px;
+    border: 1px solid var(--border-subtle, transparent);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-mod-subtle, var(--background-secondary, #1e1f22));
+    font-size: 13px;
+    color: var(--text-muted, #b5bac1);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ========== Events: per-guild rollup header (non-interactive variant) ========== */
+
+.vc-glance-guild-header-static {
+    cursor: default;
+}
+
+.vc-glance-guild-header-static:hover {
+    background: transparent;
+}
+
+/* ---- Reminders: custom HH:MM:SS duration input ---- */
+
+.vc-glance-reminder-custom {
+    width: 108px;
+    flex-shrink: 0;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.vc-glance-input-error {
+    border-color: var(--status-danger, #f23f43) !important;
+}
+
+/* ========================================================================
+   Themed thin scrollbars - match Discord's own custom scrollbars instead of
+   the OS default (which is wide and light over the dark UI).
+   ======================================================================== */
+
+.vc-glance-dropdown-menu,
+.vc-glance-palette-results,
+.vc-glance-scroll,
+.vc-glance-occupant-list,
+.vc-glance-notes,
+.vc-glance-popup-scroll,
+.vc-glance-row-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thin-thumb, rgb(255 255 255 / 16%)) transparent;
+}
+
+.vc-glance-dropdown-menu::-webkit-scrollbar,
+.vc-glance-palette-results::-webkit-scrollbar,
+.vc-glance-scroll::-webkit-scrollbar,
+.vc-glance-occupant-list::-webkit-scrollbar,
+.vc-glance-notes::-webkit-scrollbar,
+.vc-glance-popup-scroll::-webkit-scrollbar,
+.vc-glance-row-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.vc-glance-dropdown-menu::-webkit-scrollbar-track,
+.vc-glance-palette-results::-webkit-scrollbar-track,
+.vc-glance-scroll::-webkit-scrollbar-track,
+.vc-glance-occupant-list::-webkit-scrollbar-track,
+.vc-glance-notes::-webkit-scrollbar-track,
+.vc-glance-popup-scroll::-webkit-scrollbar-track,
+.vc-glance-row-list::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+}
+
+.vc-glance-dropdown-menu::-webkit-scrollbar-thumb,
+.vc-glance-palette-results::-webkit-scrollbar-thumb,
+.vc-glance-scroll::-webkit-scrollbar-thumb,
+.vc-glance-occupant-list::-webkit-scrollbar-thumb,
+.vc-glance-notes::-webkit-scrollbar-thumb,
+.vc-glance-popup-scroll::-webkit-scrollbar-thumb,
+.vc-glance-row-list::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thin-thumb, rgb(255 255 255 / 16%));
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.vc-glance-dropdown-menu::-webkit-scrollbar-thumb:hover,
+.vc-glance-palette-results::-webkit-scrollbar-thumb:hover,
+.vc-glance-scroll::-webkit-scrollbar-thumb:hover,
+.vc-glance-occupant-list::-webkit-scrollbar-thumb:hover,
+.vc-glance-notes::-webkit-scrollbar-thumb:hover,
+.vc-glance-popup-scroll::-webkit-scrollbar-thumb:hover,
+.vc-glance-row-list::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-auto-thumb, rgb(255 255 255 / 28%));
+}
+
+/* The dropdown menu is short - never show a corner or horizontal bar */
+.vc-glance-dropdown-menu::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* ========================================================================
+   Background override modes (theme-independent)
+   "solid"/"gradient" paint an OPAQUE page background and make the widget
+   cards opaque too, so a busy Discord/Nitro theme can't bleed through.
+   ======================================================================== */
+
+/* Card base colour per mode (cascades to descendant cards) */
+.vc-glance-bg-solid { --vcg-card: color-mix(in srgb, #ffffff 6%, var(--vcg-bg, #1a1b1e)); }
+.vc-glance-bg-gradient { --vcg-card: #202127; }
+
+/* Opaque page background */
+.vc-glance-layer.vc-glance-bg-solid {
+    background: var(--vcg-bg, #1a1b1e);
+}
+
+.vc-glance-layer.vc-glance-bg-gradient {
+    background: linear-gradient(var(--vcg-angle, 135deg), var(--vcg-primary, #5865f2), var(--vcg-accent, #00a8fc));
+}
+
+/* Opaque cards + hero: theme (or gradient) never shows through the surfaces.
+   The colour-intensity tint still applies on top of the opaque base. */
+.vc-glance-bg-override .vc-glance-card,
+.vc-glance-bg-override .vc-glance-hero {
+    background:
+        linear-gradient(var(--vcg-angle, 135deg),
+            color-mix(in srgb, var(--vcg-primary) var(--vcg-tint, 0%), transparent),
+            color-mix(in srgb, var(--vcg-accent) var(--vcg-tint-soft, 0%), transparent)),
+        color-mix(in srgb, var(--vcg-card) var(--vcg-surface-opacity, 90%), var(--vcg-bg, #1a1b1e)) !important;
+    backdrop-filter: none !important;
+    border-color: rgb(255 255 255 / 8%);
+}
+
+/* The hero aurora is redundant/noisy over an override background */
+.vc-glance-bg-override .vc-glance-hero-aurora {
+    display: none;
+}
+
+/* Light background → flip content colours to dark for legibility (main layer) */
+.vc-glance-layer.vc-glance-bg-light {
+    --vcg-card: color-mix(in srgb, #000000 6%, #f2f3f5);
+    --text-default: #17181b;
+    --text-muted: #494d54;
+    --header-primary: #060607;
+    --header-secondary: #494d54;
+    --icon-muted: #494d54;
+    --interactive-text-active: #060607;
+    --channels-default: #3a3d44;
+    color: #17181b;
+}
+
+.vc-glance-layer.vc-glance-bg-light .vc-glance-topbar-title,
+.vc-glance-layer.vc-glance-bg-light .vc-glance-hero-greeting,
+.vc-glance-layer.vc-glance-bg-light .vc-glance-card-title,
+.vc-glance-layer.vc-glance-bg-light .vc-glance-row-title {
+    color: #060607;
+}
+
+.vc-glance-layer.vc-glance-bg-light .vc-glance-card {
+    border-color: rgb(0 0 0 / 10%);
+}
+
+/* Customize panel: background colour row wraps its hint neatly */
+.vc-glance-bg-color-row {
+    flex-wrap: wrap;
+}
+
+.vc-glance-bg-color-row .vc-glance-hint {
+    flex-basis: 100%;
+}
+
+/* ========================================================================
+   Light-theme adaptation (.vc-glance-on-light - measured at runtime from the
+   resolved text colour, so Nitro gradient themes count too).
+
+   Discord's --background-mod-* tokens are BLACK-alpha under light themes; over
+   a pastel gradient they render as the muddy grey slabs visible in the design
+   screenshots. On light themes the cards become white glass instead, and every
+   hard-coded white-ink hover/border flips to dark ink.
+   ======================================================================== */
+
+.vc-glance-on-light .vc-glance-card,
+.vc-glance-on-light .vc-glance-hero {
+    background: rgb(255 255 255 / 52%);
+    border-color: rgb(0 0 0 / 8%);
+}
+
+/* Keep the user's tint on top of the glass in the classic material */
+.vc-glance-on-light.vc-glance-material-classic .vc-glance-card,
+.vc-glance-on-light.vc-glance-material-classic .vc-glance-hero {
+    background:
+        linear-gradient(var(--vcg-angle, 135deg),
+            color-mix(in srgb, var(--vcg-primary, #5865f2) var(--vcg-tint, 0%), transparent),
+            color-mix(in srgb, var(--vcg-accent, #00a8fc) var(--vcg-tint-soft, 0%), transparent)),
+        rgb(255 255 255 / 52%);
+}
+
+.vc-glance-on-light .vc-glance-subcard {
+    background: rgb(255 255 255 / 48%);
+}
+
+.vc-glance-on-light .vc-glance-row,
+.vc-glance-on-light .vc-glance-occupant-list {
+    background: rgb(0 0 0 / 5%);
+}
+
+.vc-glance-on-light .vc-glance-row:hover {
+    background: rgb(0 0 0 / 9%);
+}
+
+.vc-glance-on-light .vc-glance-notes,
+.vc-glance-on-light .vc-glance-input,
+.vc-glance-on-light .vc-glance-composer-input,
+.vc-glance-on-light .vc-glance-dropdown-trigger,
+.vc-glance-on-light .vc-glance-timestamp-preview {
+    background: rgb(255 255 255 / 55%);
+    border-color: rgb(0 0 0 / 10%);
+}
+
+.vc-glance-on-light .vc-glance-guild-header:hover,
+.vc-glance-on-light .vc-glance-inbox-tab:hover,
+.vc-glance-on-light .vc-glance-fmt-btn:hover,
+.vc-glance-on-light .vc-glance-note-tool:hover {
+    background: rgb(0 0 0 / 7%);
+}
+
+.vc-glance-on-light .vc-glance-inbox-tab-active {
+    background: rgb(0 0 0 / 10%);
+}
+
+.vc-glance-on-light .vc-glance-guild-header-count {
+    background: rgb(0 0 0 / 8%);
+}
+
+.vc-glance-on-light .vc-glance-popup-banner {
+    background: rgb(255 255 255 / 70%);
+}
+
+.vc-glance-on-light .vc-glance-drop-slot {
+    border-color: rgb(0 0 0 / 22%);
+    background: rgb(0 0 0 / 4%);
+}
+
+.vc-glance-on-light .vc-glance-emoji-suggest,
+.vc-glance-on-light .vc-glance-dropdown-menu,
+.vc-glance-on-light .vc-glance-palette {
+    border-color: rgb(0 0 0 / 10%);
+}
+
+/* ---- Rail user strip inks: the strip is transparent, so its controls sit on
+   the THEME's sidebar. Light theme + no nameplate art behind = dark ink; when
+   the nameplate IS there its scrim darkens the area, so light ink returns. */
+.vc-glance-on-light .vc-glance-rail-strip {
+    --text-default: #2e3338;
+    --icon-muted: #4e5058;
+    --interactive-normal: #4e5058;
+    color: #2e3338;
+}
+
+.vc-glance-on-light .vc-glance-rail-panel-plated,
+.vc-glance-rail-panel-plated {
+    --text-default: #f2f3f5;
+    --icon-muted: #dbdee1;
+    --interactive-normal: #dbdee1;
+    color: #f2f3f5;
+}
+
+/* ========================================================================
+   Orion widget - optional remote control for the OrionQuests plugin
+   ======================================================================== */
+
+.vc-glance-orion-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vc-glance-orion-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--background-mod-strong, rgb(0 0 0 / 24%));
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-orion-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted, #949ba4);
+}
+
+.vc-glance-orion-state-running .vc-glance-orion-dot {
+    background: var(--status-positive, #23a55a);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--status-positive, #23a55a) 30%, transparent);
+    animation: vc-glance-orion-pulse 1.6s ease-in-out infinite;
+}
+
+.vc-glance-orion-state-stopped .vc-glance-orion-dot {
+    background: var(--status-danger, #f23f43);
+}
+
+@keyframes vc-glance-orion-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-orion-state-running .vc-glance-orion-dot {
+        animation: none;
+    }
+}
+
+.vc-glance-orion-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.vc-glance-orion-button-status {
+    background: var(--background-mod-strong, rgb(255 255 255 / 8%));
+    color: var(--text-default, #dbdee1);
+}
+
+.vc-glance-orion-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-glance-orion-task {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.vc-glance-orion-task-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.vc-glance-orion-task-name {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-default, #dbdee1);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vc-glance-orion-task-status {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-muted, #949ba4);
+}
+
+.vc-glance-orion-task-active .vc-glance-orion-task-status {
+    color: var(--vcg-accent, var(--brand-500, #5865f2));
+}
+
+.vc-glance-orion-task-done .vc-glance-orion-task-status {
+    color: var(--status-positive, #23a55a);
+}
+
+.vc-glance-orion-track {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--background-mod-strong, rgb(0 0 0 / 24%));
+    overflow: hidden;
+}
+
+.vc-glance-orion-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--vcg-accent, var(--brand-500, #5865f2));
+    transition: width 0.3s ease;
+}
+
+.vc-glance-orion-task-done .vc-glance-orion-fill {
+    background: var(--status-positive, #23a55a);
+}

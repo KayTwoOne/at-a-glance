@@ -1,0 +1,31 @@
+# At a glance - userplugin source repo
+# This repo holds ONLY the plugin source; it is built by a parent Vencord
+# checkout, so there is no build output to track here.
+
+# Dependencies / build artifacts (should never appear in this repo)
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# Logs and caches
+*.log
+.cache/
+.eslintcache
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Personal / not-for-release (kept out even if dropped in by accident)
+concept*.png
+design/
+scratch/
+scratchpad/
