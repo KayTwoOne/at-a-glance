@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="At a glance" width="100%">
+<img src="assets/banner.jpg" alt="At a glance" width="100%">
 
 **A customizable overview page for Discord, one tab above your Friends button.**
 
