@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.6.3 - 2026-07-15
+
+### Fixed
+- **The timestamp "Copy" button now works.** The Quick Tools timestamp builder
+  (and the message Copy action in the chat popup) used a fragile clipboard lookup
+  that failed in the desktop app for everyone. Both now use the client's own
+  clipboard helper - `DiscordNative` on desktop, the web clipboard in the browser
+  build - so copying is reliable everywhere.
+
+### Changed
+- Plugin author is now shown as the handle **dotkay** rather than a personal name.
+
+### Security re-audit
+- Full line-by-line security, performance and Discord-ToS re-audit (first since
+  v0.8.0). **No critical, high, or medium findings** - no token access, no
+  injection sinks, one opt-in allowlisted host (Open-Meteo), balanced
+  listeners/timers, and zero automated API activity. Write-up in
+  [SECURITY.md](SECURITY.md).
+- Fixed two trivial lifecycle nits found in the pass: a pending Quick Tools timer
+  and the reminder scheduler's one-shot startup timeout could each fire once
+  after the plugin was disabled. Both are now cleared in `stop()`.
+
 ## 2.6.2 - 2026-07-14
 
 ### Added

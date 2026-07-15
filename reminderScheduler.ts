@@ -14,6 +14,7 @@ import { markReminderNotified, pendingReminderNotifications } from "./data";
 const logger = new Logger("AtAGlance");
 
 let intervalId: ReturnType<typeof setInterval> | undefined;
+let startupTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
 function tick() {
     const due = pendingReminderNotifications();
@@ -44,12 +45,16 @@ export function startReminderScheduler() {
     // A 20s cadence keeps timed reminders punctual without meaningful cost
     intervalId = setInterval(tick, 20_000);
     // Catch anything already due at startup shortly after boot settles
-    setTimeout(tick, 4_000);
+    startupTimeoutId = setTimeout(tick, 4_000);
 }
 
 export function stopReminderScheduler() {
     if (intervalId) {
         clearInterval(intervalId);
         intervalId = undefined;
+    }
+    if (startupTimeoutId) {
+        clearTimeout(startupTimeoutId);
+        startupTimeoutId = undefined;
     }
 }

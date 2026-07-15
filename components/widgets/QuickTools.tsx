@@ -4,16 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByPropsLazy } from "@webpack";
+import { copyToClipboard } from "@utils/clipboard";
 import { moment, React, showToast, Toasts } from "@webpack/common";
 
 import { settings } from "../../settings";
 import { Dropdown } from "../Dropdown";
 import { useNow } from "../hooks";
 import { WidgetCard } from "../WidgetCard";
-
-// Discord's clipboard helper (the desktop sandbox can restrict the raw API)
-const Clipboard = findByPropsLazy("copy", "SUPPORTS_COPY") as { copy(text: string): void; SUPPORTS_COPY: boolean; };
 
 /**
  * A useState-like store whose value lives at module scope, so it SURVIVES the
@@ -239,6 +236,18 @@ function armTimer(totalMs: number) {
     }, Math.max(0, totalMs));
 }
 
+/** Called from the plugin's stop() so a pending timer can't fire after disable */
+export function disposeQuickTools() {
+    if (timerHandle) {
+        clearTimeout(timerHandle);
+        timerHandle = null;
+    }
+    if (audioCtx) {
+        try { void audioCtx.close(); } catch { /* already closed */ }
+        audioCtx = null;
+    }
+}
+
 function CountdownTimer() {
     const [timer] = timerStore.use();
     const now = useNow(250);
@@ -431,13 +440,12 @@ function TimestampBuilder() {
 
     const copy = () => {
         if (!valid) return;
-        try {
-            if (Clipboard?.SUPPORTS_COPY) Clipboard.copy(code);
-            else void navigator.clipboard?.writeText(code);
-            showToast("Timestamp copied - paste it into any chat.", Toasts.Type.SUCCESS);
-        } catch {
-            showToast("Couldn't copy to clipboard.", Toasts.Type.FAILURE);
-        }
+        // Vencord's helper uses DiscordNative.clipboard on desktop (the raw web
+        // clipboard API is unreliable inside the desktop sandbox) and the web
+        // clipboard in the browser build.
+        copyToClipboard(code)
+            .then(() => showToast("Timestamp copied - paste it into any chat.", Toasts.Type.SUCCESS))
+            .catch(() => showToast("Couldn't copy to clipboard.", Toasts.Type.FAILURE));
     };
 
     return (

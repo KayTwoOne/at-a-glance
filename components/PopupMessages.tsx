@@ -11,6 +11,7 @@
  */
 
 import { getUserSettingLazy } from "@api/UserSettings";
+import { copyToClipboard } from "@utils/clipboard";
 import { Logger } from "@utils/Logger";
 import { findByPropsLazy, findComponentByCodeLazy, findCssClassesLazy } from "@webpack";
 import {
@@ -35,7 +36,6 @@ const MessageDisplayCompact = getUserSettingLazy("textAndImages", "messageDispla
 
 // Discord's own clipboard helper (works in the desktop sandbox where the raw
 // navigator.clipboard can be restricted)
-const Clipboard = findByPropsLazy("copy", "SUPPORTS_COPY") as { copy(text: string): void; SUPPORTS_COPY: boolean; };
 
 // Discord's message action creators - editMessage saves an edit server-side;
 // getSendMessageOptionsForReply turns a pending reply into the send options
@@ -77,12 +77,8 @@ function cancelReply(channelId: string) {
 }
 
 function copyText(text: string) {
-    try {
-        if (Clipboard?.SUPPORTS_COPY) Clipboard.copy(text);
-        else void navigator.clipboard?.writeText(text);
-    } catch (e) {
-        logger.error("Failed to copy", e);
-    }
+    // DiscordNative clipboard on desktop, web clipboard in the browser build
+    copyToClipboard(text).catch(e => logger.error("Failed to copy", e));
 }
 
 function MessageMenu({ channel, message, isOwn, onEdit }: { channel: any; message: any; isOwn: boolean; onEdit: () => void; }) {

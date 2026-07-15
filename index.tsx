@@ -14,6 +14,7 @@ import { ChannelStore, Menu, SelectedChannelStore, showToast, Toasts, UserStore 
 
 import { closeGlanceIfOpen, openGlance } from "./components/GlanceLayer";
 import { GlanceTab } from "./components/GlanceTab";
+import { disposeQuickTools } from "./components/widgets/QuickTools";
 import {
     addBookmark,
     isBookmarked,
@@ -216,7 +217,9 @@ let startupOpened = false;
 export default definePlugin({
     name: "AtAGlance",
     description: "A customizable 'At a glance' tab above the Friends button: pinned friends with quick actions, watched voice/text channels, tools and integrations - all in one Discord-native view.",
-    authors: [{ name: "Kaylum", id: 0n }],
+    // Public handle, not a legal name; the repo (github.com/KayTwoOne/at-a-glance)
+    // is linked from the README. id 0n = no Discord-profile link (none supplied).
+    authors: [{ name: "dotkay", id: 0n }],
 
     settings,
 
@@ -269,6 +272,7 @@ export default definePlugin({
 
     stop() {
         stopReminderScheduler();
+        disposeQuickTools();
         window.removeEventListener("keydown", onHotkeyKeydown);
         for (const type of MOUSE_HOTKEY_EVENTS) {
             window.removeEventListener(type, onMouseHotkey as EventListener, true);

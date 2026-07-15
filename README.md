@@ -4,7 +4,7 @@
 
 **A customizable overview page for Discord, one tab above your Friends button.**
 
-[![Version](https://img.shields.io/badge/version-2.6.2-D33699?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.3-D33699?style=flat-square)](CHANGELOG.md)
 [![Vencord](https://img.shields.io/badge/vencord%20%7C%20equicord-userplugin-9c85ef?style=flat-square)](https://vencord.dev)
 [![Discord](https://img.shields.io/badge/discord-stable-57F287?style=flat-square)](#install)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
@@ -33,8 +33,8 @@ message rendering, native pickers, native send pipeline.
 - **Your nameplate, everywhere.** The bottom-left user area wraps your Nitro
   nameplate around the whole strip, fading up into the sidebar.
 - **Honest security posture.** One webpack patch, one external host (Open-Meteo for
-  weather), validated storage, no eval, no token access. Details in
-  [SECURITY.md](SECURITY.md).
+  weather), validated storage, no eval, no token access, no automated API activity.
+  Re-audited at v2.6.3 with no security findings - details in [SECURITY.md](SECURITY.md).
 
 ## Widgets
 
@@ -111,14 +111,21 @@ including multi-plugin setups, updating and troubleshooting, is in
 
 Dev loop: edit, `pnpm build` (or `pnpm dev` for watch), `Ctrl+R` in Discord.
 
-## Architecture
+## Architecture & security
 
 One webpack patch inserts the sidebar tab (the same anchor Vencord's own PinDMs
 uses); everything else goes through stable Vencord APIs. Config is validated and
 capped on every load (IDs, notes text, weather location, layout state only) and
 stored per account in IndexedDB. Message sending, blocking, calls, notes and RSVP
-all invoke the same action creators Discord's own UI uses. Every widget sits in an
-error boundary, so one broken internal never takes the page down.
+all invoke the same action creators Discord's own UI uses - always user-initiated,
+never on a timer, so there's no self-bot / rate-limit exposure. Every widget sits
+in an error boundary (the injected tab a no-op one), so one broken internal never
+takes the page - or Discord - down.
+
+Re-audited at v2.6.3 (2026-07-15) with no security findings: no token access, no
+`eval`/`innerHTML`/injection sinks, one opt-in external host (Open-Meteo, pinned
+and allowlisted), and balanced listeners/timers that are fully torn down on
+disable. Full write-up in **[SECURITY.md](SECURITY.md)**.
 
 Known limitations live at the bottom of [SETUP.md](SETUP.md#troubleshooting); the
 short version is that the popup renders messages outside Discord's full list
