@@ -4,7 +4,7 @@
 
 **A customizable overview page for Discord, one tab above your Friends button.**
 
-[![Version](https://img.shields.io/badge/version-2.6.1-D33699?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.2-D33699?style=flat-square)](CHANGELOG.md)
 [![Vencord](https://img.shields.io/badge/vencord-userplugin-9c85ef?style=flat-square)](https://vencord.dev)
 [![Discord](https://img.shields.io/badge/discord-stable-57F287?style=flat-square)](#install)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)

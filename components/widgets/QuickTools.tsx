@@ -38,7 +38,7 @@ function persistentState<T>(initial: T) {
         }, []);
         return [value, set];
     };
-    return { use };
+    return { use, set, get: () => value };
 }
 
 /** Validates an IANA timezone name without throwing */
@@ -92,6 +92,59 @@ function DigitalClock() {
             </div>
         </div>
     );
+}
+
+// One shared AudioContext. It's created and unlocked on the "Set" click (a user
+// gesture), so the chime can still fire later from a timeout even if the widget
+// is collapsed or the page is closed by then.
+let audioCtx: AudioContext | null = null;
+
+/** Create/resume the AudioContext during a user gesture so later playback works */
+function primeAudio() {
+    try {
+        const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+        if (!Ctx) return;
+        audioCtx ??= new Ctx();
+        if (audioCtx!.state === "suspended") void audioCtx!.resume();
+    } catch {
+        // audio unavailable - the toast still fires
+    }
+}
+
+/**
+ * A short, soft three-note chime (C6-E6-G6) on sine waves with a gentle
+ * attack/decay envelope - a pleasant "ding", nothing jarring. Soft-fails
+ * anywhere Web Audio isn't available.
+ */
+function playTimerChime() {
+    try {
+        primeAudio();
+        const ctx = audioCtx;
+        if (!ctx) return;
+
+        const notes = [1046.5, 1318.5, 1568.0]; // C6, E6, G6
+        const master = ctx.createGain();
+        master.gain.value = 0.18; // quiet by design
+        master.connect(ctx.destination);
+
+        notes.forEach((freq, i) => {
+            const t0 = ctx.currentTime + i * 0.14;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = freq;
+            // soft ramp up, gentle exponential tail - no click, no harshness
+            gain.gain.setValueAtTime(0.0001, t0);
+            gain.gain.exponentialRampToValueAtTime(1, t0 + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.5);
+            osc.connect(gain);
+            gain.connect(master);
+            osc.start(t0);
+            osc.stop(t0 + 0.55);
+        });
+    } catch {
+        // audio unavailable - the toast still fires
+    }
 }
 
 function formatDuration(totalMs: number) {
@@ -161,22 +214,45 @@ interface TimerState {
 }
 const timerStore = persistentState<TimerState>({ minutes: "5", seconds: "0", endsAt: null });
 
+// The completion side-effects (clear, toast, chime) are driven by a module-level
+// timeout, NOT the component - so they fire even if the Quick Tools card is
+// collapsed or the page is closed when the countdown hits zero.
+let timerHandle: ReturnType<typeof setTimeout> | null = null;
+
+function stopTimer() {
+    if (timerHandle) {
+        clearTimeout(timerHandle);
+        timerHandle = null;
+    }
+    timerStore.set(t => ({ ...t, endsAt: null }));
+}
+
+function armTimer(totalMs: number) {
+    if (timerHandle) clearTimeout(timerHandle);
+    const endsAt = Date.now() + totalMs;
+    timerStore.set(t => ({ ...t, endsAt }));
+    timerHandle = setTimeout(() => {
+        timerHandle = null;
+        timerStore.set(t => ({ ...t, endsAt: null }));
+        showToast("⏰ Quick Tools timer finished!", Toasts.Type.SUCCESS);
+        if (settings.store.timerSound) playTimerChime();
+    }, Math.max(0, totalMs));
+}
+
 function CountdownTimer() {
-    const [timer, setTimer] = timerStore.use();
+    const [timer] = timerStore.use();
     const now = useNow(250);
 
-    const remaining = timer.endsAt === null ? null : timer.endsAt - now;
+    const remaining = timer.endsAt === null ? null : Math.max(0, timer.endsAt - now);
 
-    React.useEffect(() => {
-        if (remaining !== null && remaining <= 0) {
-            setTimer(t => ({ ...t, endsAt: null }));
-            showToast("⏰ Quick Tools timer finished!", Toasts.Type.SUCCESS);
-        }
-    }, [remaining !== null && remaining <= 0]);
+    const setField = (patch: Partial<TimerState>) => timerStore.set(t => ({ ...t, ...patch }));
 
     const start = () => {
+        // Runs on a click (user gesture): unlock audio now so the chime can play
+        // later even from the background timeout.
+        primeAudio();
         const totalMs = (clampInt(timer.minutes, 999) * 60 + clampInt(timer.seconds, 59)) * 1000;
-        if (totalMs > 0) setTimer(t => ({ ...t, endsAt: Date.now() + totalMs }));
+        if (totalMs > 0) armTimer(totalMs);
     };
 
     return (
@@ -189,7 +265,7 @@ function CountdownTimer() {
                             className="vc-glance-input vc-glance-timer-input"
                             type="text" inputMode="numeric" maxLength={3}
                             value={timer.minutes} placeholder="Min"
-                            onChange={e => setTimer(t => ({ ...t, minutes: e.target.value.replace(/\D/g, "") }))}
+                            onChange={e => setField({ minutes: e.target.value.replace(/\D/g, "") })}
                             aria-label="Minutes"
                         />
                         <span className="vc-glance-timer-sep">:</span>
@@ -197,7 +273,7 @@ function CountdownTimer() {
                             className="vc-glance-input vc-glance-timer-input"
                             type="text" inputMode="numeric" maxLength={2}
                             value={timer.seconds} placeholder="Sec"
-                            onChange={e => setTimer(t => ({ ...t, seconds: e.target.value.replace(/\D/g, "") }))}
+                            onChange={e => setField({ seconds: e.target.value.replace(/\D/g, "") })}
                             aria-label="Seconds"
                         />
                         <button className="vc-glance-button vc-glance-button-brand" onClick={start}>Set</button>
@@ -207,7 +283,7 @@ function CountdownTimer() {
                     <>
                         <div className="vc-glance-tool-display">{formatDuration(remaining)}</div>
                         <div className="vc-glance-tool-buttons">
-                            <button className="vc-glance-button vc-glance-button-danger" onClick={() => setTimer(t => ({ ...t, endsAt: null }))}>
+                            <button className="vc-glance-button vc-glance-button-danger" onClick={stopTimer}>
                                 Cancel
                             </button>
                         </div>

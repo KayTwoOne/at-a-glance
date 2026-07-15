@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.6.2 - 2026-07-14
+
+### Added
+- **The Quick Tools timer now plays a soft chime when it reaches zero** - a
+  short, gentle three-note ding (Web Audio, nothing jarring) alongside the
+  existing toast. It fires even if the Quick Tools card is collapsed or the page
+  is closed, because completion is now driven by a background timer rather than
+  the on-screen countdown. New setting **"Play a soft chime when the Quick Tools
+  timer reaches zero"** (on by default) to turn it off.
+
 ## 2.6.1 - 2026-07-14
 
 ### Fixed

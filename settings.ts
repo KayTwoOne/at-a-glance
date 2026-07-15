@@ -43,6 +43,11 @@ export const settings = definePluginSettings({
         description: "Extra clocks for Quick Tools: comma-separated IANA timezones (e.g. UTC, Europe/Berlin)",
         default: "UTC"
     },
+    timerSound: {
+        type: OptionType.BOOLEAN,
+        description: "Play a soft chime when the Quick Tools timer reaches zero",
+        default: true
+    },
     temperatureUnit: {
         type: OptionType.SELECT,
         description: "Temperature unit for the weather card",
