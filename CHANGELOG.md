@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.8.0 - 2026-07-20
+
+### Appearance, dialed back
+- Removed the **Frosted** and **Flat** materials, the **Match Discord theme** toggle
+  and the film grain option added in 2.7.0. Materials are back to three: Classic,
+  Acrylic, Glass.
+- All six presets (Magenta, Nord, Dracula, Catppuccin Mocha, Rosé Pine, Mono)
+  retuned to subtle Acrylic/Glass looks. Presets deliberately leave your
+  background alone now - that's yours to choose.
+- New installs default to a solid `#171717` background (Discord's own dark
+  surface) instead of following the client theme.
+
+### Quick Access
+- **Pinned group DMs work like DMs again.** Discord reports them as
+  voice-capable, so they'd become voice-only rows. A single click now opens
+  the chat popup, a double-click starts or joins the call, and Enter/Space
+  still expands the row to see who's in the call.
+
+### Greeting
+- The hero summary line is now clickable: it opens a small **notification
+  panel** listing your mentions and unread DMs, with a dismiss on each row and
+  a **"Mark all read"** - so clearing them still works even with the Inbox
+  widget hidden.
+
+## 2.7.0 - 2026-07-20
+
+### Appearance
+- Two new materials: **Frosted** (heavy glass) and **Flat** (opaque, high-contrast, accessible - drops the surface tint so text stays AA-legible at any colour/intensity).
+- Optional **film grain** overlay that removes gradient banding.
+- **Theme presets**: Magenta, Nord, Dracula, Catppuccin Mocha, Rosé Pine, Mono - one click each.
+- **Match Discord theme**: derive the primary/accent from your live Discord/Nitro theme; the colour pickers dim while it's on.
+
+### Accessibility
+- Full `prefers-reduced-motion` pass, including the body-portaled dropdown and popup animations; the Flat material is a fully accessible, blur-free option.
+
 ## 2.6.3 - 2026-07-15
 
 ### Fixed
@@ -11,6 +46,8 @@
 
 ### Changed
 - Plugin author is now shown as the handle **dotkay** rather than a personal name.
+- Added plugin **tags** (Utility, Friends, Organisation, Chat) so it surfaces in
+  Vencord's plugin search.
 
 ### Security re-audit
 - Full line-by-line security, performance and Discord-ToS re-audit (first since

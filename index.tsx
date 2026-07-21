@@ -220,6 +220,7 @@ export default definePlugin({
     // Public handle, not a legal name; the repo (github.com/KayTwoOne/at-a-glance)
     // is linked from the README. id 0n = no Discord-profile link (none supplied).
     authors: [{ name: "dotkay", id: 0n }],
+    tags: ["Utility", "Friends", "Organisation", "Chat"],
 
     settings,
 

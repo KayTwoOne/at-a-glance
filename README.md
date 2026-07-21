@@ -4,7 +4,7 @@
 
 **A customizable overview page for Discord, one tab above your Friends button.**
 
-[![Version](https://img.shields.io/badge/version-2.6.3-D33699?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.8.0-D33699?style=flat-square)](CHANGELOG.md)
 [![Vencord](https://img.shields.io/badge/vencord%20%7C%20equicord-userplugin-9c85ef?style=flat-square)](https://vencord.dev)
 [![Discord](https://img.shields.io/badge/discord-stable-57F287?style=flat-square)](#install)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
@@ -28,8 +28,10 @@ message rendering, native pickers, native send pipeline.
   message grouping and a "new messages" bar when you're scrolled up.
 - **Everything is arrangeable.** Widgets drag between slots, friends drag into your
   own order, server sections drag and collapse. All of it persists per account.
-- **Theme-proof.** Surfaces and inks adapt to light and dark themes automatically,
-  Nitro gradients included, and your own primary/accent choices layer on top.
+- **Theme-proof and yours.** Surfaces and inks adapt to light and dark themes
+  automatically, Nitro gradients included. Three materials (classic, acrylic, glass)
+  and one-click colour presets (Nord, Dracula, Catppuccin and more) at subtle,
+  tasteful intensities - the background is entirely yours to set, solid by default.
 - **Your nameplate, everywhere.** The bottom-left user area wraps your Nitro
   nameplate around the whole strip, fading up into the sidebar.
 - **Honest security posture.** One webpack patch, one external host (Open-Meteo for
@@ -42,7 +44,7 @@ message rendering, native pickers, native send pipeline.
 | --- | --- |
 | **Pinned Friends** | Presence, live activity, DM mention badges. Click for quick chat; right-click for profile, call, notes, nicknames, block and more. Two per row, drag to reorder. |
 | **Inbox** | Two tabs: **Mentions** (Discord's recent-mentions inbox) and **Direct Messages** (every unread DM with avatar, preview and badge). Mark all read per tab. |
-| **Quick Access Channels** | Watched channels grouped per server with collapsible headers that carry their own mention badge / unread dot. Voice rows show live occupants; double-click joins. |
+| **Quick Access Channels** | Watched channels grouped per server with collapsible headers that carry their own mention badge / unread dot. Voice rows show live occupants; double-click joins. A pinned group DM opens its chat on click and starts (or joins) the call on double-click; Enter/Space still expands the row to see who's in the call. |
 | **Quick chat popup** | The centred chat card described above. Per-channel scroll memory, unread NEW divider, viewing acks the channel like a real view. |
 | **Quick Tools** | Clock with extra timezones, stopwatch, countdown, calculator, and a `<t:…>` timestamp builder with live preview. |
 | **Integrations & Notes** | Open-Meteo weather, Spotify now-playing (read-only, local), and structured notes with bullets, clickable todos and dividers. |
@@ -53,7 +55,8 @@ message rendering, native pickers, native send pipeline.
 
 There's also a command palette (default `Shift+Space`), a quick-pin hotkey
 (default `Ctrl+Shift+P`), a greeting header that counts your mentions, unread DMs
-and channels, and an optional open-on-startup mode.
+and channels - click the summary to open a notification panel with per-item
+dismiss and "Mark all read" - and an optional open-on-startup mode.
 
 ## Orion add-on (optional)
 

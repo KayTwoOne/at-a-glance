@@ -76,8 +76,8 @@ export const DEFAULT_APPEARANCE: GlanceAppearance = {
     accent: "#00a8fc",
     intensity: 0,
     angle: 135,
-    backgroundMode: "theme",
-    backgroundColor: "#1a1b1e",
+    backgroundMode: "solid",
+    backgroundColor: "#171717",
     surfaceOpacity: 90,
     nameColor: null
 };

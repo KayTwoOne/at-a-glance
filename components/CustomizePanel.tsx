@@ -5,7 +5,7 @@
  */
 
 import { RenderModalProps } from "@vencord/discord-types";
-import { Modal } from "@webpack/common";
+import { Modal, showToast, Toasts } from "@webpack/common";
 
 import {
     DEFAULT_APPEARANCE,
@@ -16,6 +16,7 @@ import {
     setAppearance,
     useGlanceConfig
 } from "../data";
+import { GLANCE_PRESETS } from "../presets";
 import { ArrowIcon } from "./icons";
 import { openGlanceModal, useGlanceModalGuard } from "./modals";
 
@@ -55,6 +56,29 @@ function CustomizeModal({ modalProps }: { modalProps: RenderModalProps; }) {
             ]}
         >
             <div className="vc-glance-customize-body">
+                <div className="vc-glance-customize-section">
+                    <span className="vc-glance-customize-label">Presets</span>
+                    <div className="vc-glance-preset-row">
+                        {GLANCE_PRESETS.map(preset => (
+                            <button
+                                key={preset.id}
+                                className="vc-glance-preset-chip"
+                                title={preset.label}
+                                onClick={() => {
+                                    setAppearance(preset.apply);
+                                    showToast(`Applied ${preset.label}`, Toasts.Type.SUCCESS);
+                                }}
+                            >
+                                <span
+                                    className="vc-glance-preset-swatch"
+                                    style={{ background: `linear-gradient(135deg, ${preset.swatch[0]}, ${preset.swatch[1]})` }}
+                                />
+                                <span className="vc-glance-preset-name">{preset.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="vc-glance-customize-section">
                     <span className="vc-glance-customize-label">Background</span>
                     <div className="vc-glance-segmented">
@@ -120,31 +144,33 @@ function CustomizeModal({ modalProps }: { modalProps: RenderModalProps; }) {
                     </div>
                 </div>
 
-                <div className="vc-glance-customize-section vc-glance-customize-colors">
-                    <div className="vc-glance-customize-color">
-                        <span className="vc-glance-customize-label">Primary</span>
-                        <div className="vc-glance-color-row">
-                            <input
-                                type="color"
-                                className="vc-glance-color-input"
-                                value={appearance.primary}
-                                onChange={e => setAppearance({ primary: e.target.value })}
-                                aria-label="Primary colour"
-                            />
-                            <span className="vc-glance-color-hex">{appearance.primary}</span>
+                <div className="vc-glance-customize-section">
+                    <div className="vc-glance-customize-colors">
+                        <div className="vc-glance-customize-color">
+                            <span className="vc-glance-customize-label">Primary</span>
+                            <div className="vc-glance-color-row">
+                                <input
+                                    type="color"
+                                    className="vc-glance-color-input"
+                                    value={appearance.primary}
+                                    onChange={e => setAppearance({ primary: e.target.value })}
+                                    aria-label="Primary colour"
+                                />
+                                <span className="vc-glance-color-hex">{appearance.primary}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="vc-glance-customize-color">
-                        <span className="vc-glance-customize-label">Accent</span>
-                        <div className="vc-glance-color-row">
-                            <input
-                                type="color"
-                                className="vc-glance-color-input"
-                                value={appearance.accent}
-                                onChange={e => setAppearance({ accent: e.target.value })}
-                                aria-label="Accent colour"
-                            />
-                            <span className="vc-glance-color-hex">{appearance.accent}</span>
+                        <div className="vc-glance-customize-color">
+                            <span className="vc-glance-customize-label">Accent</span>
+                            <div className="vc-glance-color-row">
+                                <input
+                                    type="color"
+                                    className="vc-glance-color-input"
+                                    value={appearance.accent}
+                                    onChange={e => setAppearance({ accent: e.target.value })}
+                                    aria-label="Accent colour"
+                                />
+                                <span className="vc-glance-color-hex">{appearance.accent}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

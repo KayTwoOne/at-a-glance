@@ -5,10 +5,9 @@
  */
 
 import { Logger } from "@utils/Logger";
-import { findByPropsLazy, findStoreLazy } from "@webpack";
+import { findByPropsLazy } from "@webpack";
 import {
     ChannelStore,
-    FluxDispatcher,
     GuildStore,
     IconUtils,
     MessageStore,
@@ -23,23 +22,10 @@ import {
 
 import { openChannelPopup } from "../ChannelPopup";
 import { CheckIcon, CloseIcon } from "../icons";
+import { ackAllDms, ackChannel, markAllRead, MentionActions, RecentMentionsStore } from "../notifications";
 import { WidgetCard } from "../WidgetCard";
 
 const logger = new Logger("AtAGlance");
-
-// Discord's own Inbox internals: the store updates itself in realtime as new
-// mentions arrive, the actions hit the same endpoints the native Inbox uses
-const RecentMentionsStore = findStoreLazy("RecentMentionsStore") as {
-    getMentions(): any[] | null;
-    hasLoadedEver: boolean;
-    loading: boolean;
-};
-
-const MentionActions = findByPropsLazy("fetchRecentMentions", "deleteRecentMention") as {
-    fetchRecentMentions(options: { limit?: number; guildId?: string | null; roles?: boolean; everyone?: boolean; }): Promise<unknown>;
-    deleteRecentMention(messageId: string): void;
-    clearMentions(): void;
-};
 
 // Pulls a channel's newest message into MessageStore so the DM preview is the
 // real latest, not a stale cached one
@@ -48,35 +34,6 @@ const MessageFetchActions = findByPropsLazy("fetchMessages", "jumpToMessage") as
 };
 
 const MAX_SHOWN = 15;
-
-/**
- * Clears the inbox for real: acks each channel's read state AND deletes each
- * recent mention server-side (`deleteRecentMention`, the same call the per-row
- * ✕ uses). `clearMentions()` alone only clears locally, so Discord re-populates
- * the list on the next fetch - deleting each mention persists.
- */
-function markAllRead(mentions: any[]) {
-    try {
-        const channels = [...new Set(mentions.map(m => m.channel_id as string))]
-            .map(channelId => ({
-                channelId,
-                messageId: ReadStateStore.lastMessageId(channelId),
-                readStateType: 0
-            }))
-            .filter(entry => entry.messageId);
-
-        if (channels.length > 0) {
-            FluxDispatcher.dispatch({ type: "BULK_ACK", context: "APP", channels });
-        }
-
-        // Persistently remove each mention from Discord's inbox
-        for (const mention of mentions) {
-            if (typeof mention?.id === "string") MentionActions.deleteRecentMention(mention.id);
-        }
-    } catch (e) {
-        logger.error("Failed to mark mentions read", e);
-    }
-}
 
 function mentionLocation(message: any): string {
     const channel = ChannelStore.getChannel(message.channel_id);
@@ -140,32 +97,8 @@ function MentionRow({ message }: { message: any; }) {
     );
 }
 
-/** Marks a channel read the way Discord's own UI does */
-function ackChannel(channelId: string) {
-    const messageId = ReadStateStore.lastMessageId(channelId);
-    if (!messageId) return;
-    FluxDispatcher.dispatch({
-        type: "BULK_ACK",
-        context: "APP",
-        channels: [{ channelId, messageId, readStateType: 0 }]
-    });
-}
-
-function ackAllDms(channels: any[]) {
-    try {
-        const acks = channels
-            .map(channel => ({ channelId: channel.id, messageId: ReadStateStore.lastMessageId(channel.id), readStateType: 0 }))
-            .filter(entry => entry.messageId);
-        if (acks.length > 0) {
-            FluxDispatcher.dispatch({ type: "BULK_ACK", context: "APP", channels: acks });
-        }
-    } catch (e) {
-        logger.error("Failed to mark DMs read", e);
-    }
-}
-
-/** Name + avatar for a DM (recipient) or group DM (channel) */
-function dmIdentity(channel: any): { name: string; avatarUrl: string | undefined; } {
+/** Name + avatar for a DM (recipient) or group DM (channel); also used by the hero panel */
+export function dmIdentity(channel: any): { name: string; avatarUrl: string | undefined; } {
     if (channel.isMultiUserDM?.()) {
         // getChannelIconURL exists at runtime but isn't in the typings; guard it
         const iconUrl = channel.icon

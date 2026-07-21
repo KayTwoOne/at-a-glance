@@ -33,7 +33,7 @@ import { guildAcronym } from "../../util";
 import { openChannelPopup } from "../ChannelPopup";
 import { closeGlance } from "../GlanceLayer";
 import { usePoll } from "../hooks";
-import { ChevronIcon, DotsIcon, HashIcon, HeadphonesIcon, MicIcon, SpeakerIcon, VideoIcon } from "../icons";
+import { ChatIcon, ChevronIcon, DotsIcon, HashIcon, HeadphonesIcon, MicIcon, SpeakerIcon, VideoIcon } from "../icons";
 import { RowDragGhost, RowDropSlot, useRowDrag } from "../rowDrag";
 import { WidgetCard } from "../WidgetCard";
 
@@ -140,6 +140,19 @@ function OccupantRow({ userId, guildId, voiceState, speaking, isNew }: {
     );
 }
 
+/** Real label for a group DM row - `channel.name || "voice"` would otherwise
+ *  show the literal word "voice" for an unnamed group. */
+function groupDMLabel(channel: any): string {
+    if (channel.name) return channel.name;
+    const names = (channel.recipients ?? [])
+        .map((id: string) => {
+            const user = UserStore.getUser(id);
+            return user?.globalName || user?.username;
+        })
+        .filter(Boolean);
+    return names.length > 0 ? names.join(", ") : "Group DM";
+}
+
 function VoiceChannelRow({ channelId, siblingIds, index, hideGuild }: { channelId: string; siblingIds: string[]; index: number; hideGuild?: boolean; }) {
     const [expanded, setExpanded] = React.useState(false);
     const channel = useStateFromStores([ChannelStore], () => ChannelStore.getChannel(channelId), [channelId]);
@@ -178,6 +191,16 @@ function VoiceChannelRow({ channelId, siblingIds, index, hideGuild }: { channelI
         prevIdsRef.current = new Set(occupantIds);
     }, [occupantIds.join(",")]);
 
+    // Discord reports group DMs as vocal (they support calls), so they land in
+    // the voice bucket. They are also real text channels, so give them both.
+    const isGroupDM = channel?.type === 3;
+
+    const clickTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    React.useEffect(() => () => {
+        if (clickTimer.current) clearTimeout(clickTimer.current);
+    }, []);
+
     if (!channel) return null;
 
     const count = occupantIds.length;
@@ -197,6 +220,25 @@ function VoiceChannelRow({ channelId, siblingIds, index, hideGuild }: { channelI
         }
     };
 
+    // A double click always fires a single click first, so opening the chat
+    // popup immediately would pop it open on the way to starting a call.
+    // Delay it briefly and let joinNow cancel it if a second click lands.
+    const openChat = () => {
+        if (clickTimer.current) clearTimeout(clickTimer.current);
+        clickTimer.current = setTimeout(() => {
+            clickTimer.current = null;
+            openChannelPopup(channelId);
+        }, 220);
+    };
+
+    const joinNow = () => {
+        if (clickTimer.current) {
+            clearTimeout(clickTimer.current);
+            clickTimer.current = null;
+        }
+        join();
+    };
+
     const openMenu = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -205,9 +247,14 @@ function VoiceChannelRow({ channelId, siblingIds, index, hideGuild }: { channelI
         ));
     };
 
+    const rowLabel = isGroupDM ? groupDMLabel(channel) : (channel.name || "voice");
+    const tooltipText = isGroupDM
+        ? "Click to open chat, double-click to call"
+        : (canJoin ? "Double-click to join" : "No permission to join");
+
     return (
         <div className={"vc-glance-voice" + (count === 0 && emptyVoiceChannelsDimmed ? " vc-glance-row-dimmed" : "")}>
-            <Tooltip text={canJoin ? "Double-click to join" : "No permission to join"}>
+            <Tooltip text={tooltipText}>
                 {props => (
                     <div
                         {...props}
@@ -215,10 +262,14 @@ function VoiceChannelRow({ channelId, siblingIds, index, hideGuild }: { channelI
                         role="button"
                         tabIndex={0}
                         aria-expanded={expanded}
-                        aria-label={`${channel.name}, ${count} in voice`}
-                        onClick={() => setExpanded(v => !v)}
-                        onDoubleClick={join}
+                        aria-label={`${isGroupDM ? rowLabel : channel.name}, ${count} in voice`}
+                        onClick={isGroupDM ? openChat : () => setExpanded(v => !v)}
+                        onDoubleClick={isGroupDM ? joinNow : join}
                         onKeyDown={e => {
+                            // Keyboard stays on expand for every row: for a group DM
+                            // the pointer now owns chat (click) and call (double
+                            // click), so this is the only way left to see who is in
+                            // the call.
                             if (e.key === "Enter" || e.key === " ") {
                                 e.preventDefault();
                                 setExpanded(v => !v);
@@ -230,9 +281,12 @@ function VoiceChannelRow({ channelId, siblingIds, index, hideGuild }: { channelI
                             className={"vc-glance-chevron" + (expanded ? " vc-glance-chevron-open" : "")}
                             size={14}
                         />
-                        <SpeakerIcon className="vc-glance-channel-type-icon" size={18} />
+                        {isGroupDM
+                            ? <ChatIcon className="vc-glance-channel-type-icon" size={18} />
+                            : <SpeakerIcon className="vc-glance-channel-type-icon" size={18} />
+                        }
                         <div className="vc-glance-row-text">
-                            <span className="vc-glance-row-title">{channel.name || "voice"}</span>
+                            <span className="vc-glance-row-title">{rowLabel}</span>
                             {guild && !hideGuild && <span className="vc-glance-row-subtitle">{guild.name}</span>}
                         </div>
                         <div className="vc-glance-row-actions" onClick={e => e.stopPropagation()}>

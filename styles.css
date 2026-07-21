@@ -69,6 +69,7 @@
 }
 
 .vc-glance-layer {
+    position: relative;
     flex: 1;
     display: flex;
     min-width: 0;
@@ -283,14 +284,77 @@ body.vc-glance-dragging .vc-glance-widget-slot {
 }
 
 .vc-glance-hero-summary {
+    display: block;
     margin: 4px 0 0;
     font-size: 14px;
     color: var(--text-muted, #949ba4);
 }
 
+/* The summary is only a <button> once there's a panel behind it to open -
+   reset the chrome without a modifier class, since "all caught up" stays a <p> */
+button.vc-glance-hero-summary {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+button.vc-glance-hero-summary:hover {
+    color: var(--text-default, #dbdee1);
+}
+
 .vc-glance-hero-summary-active {
     color: var(--text-default, #dbdee1);
     font-weight: 500;
+}
+
+/* ---- Hero notification panel: opened by the summary line, works whether or
+   not the Inbox widget is even on the board ---- */
+
+.vc-glance-hero-notifs {
+    margin: 12px 0 22px;
+    padding: 6px;
+    border-radius: var(--radius-md, 16px);
+    border: 1px solid var(--border-subtle, transparent);
+    background: var(--background-mod-subtle, var(--background-secondary, #2b2d31));
+    max-height: 360px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 5;
+    animation: vc-glance-widget-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.vc-glance-hero-notifs-section {
+    padding: 6px;
+}
+
+.vc-glance-hero-notifs-section .vc-glance-subcard-title {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.vc-glance-hero-notifs-section + .vc-glance-hero-notifs-section {
+    border-top: 1px solid var(--border-subtle, rgb(255 255 255 / 6%));
+}
+
+.vc-glance-hero-notifs-row {
+    padding: 6px 8px;
+}
+
+.vc-glance-hero-notifs-more {
+    padding: 6px 10px 2px;
+    color: var(--text-muted, #949ba4);
+    font-size: 12px;
+}
+
+.vc-glance-hero-notifs-foot {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 6px 4px;
+    border-top: 1px solid var(--border-subtle, rgb(255 255 255 / 6%));
 }
 
 .vc-glance-hero-side {
@@ -2046,6 +2110,36 @@ body[data-vc-glance-open] [class*=" panels_"] {
     box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
 }
 
+.vc-glance-preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.vc-glance-preset-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 6px;
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    border-radius: 999px;
+    background: var(--background-mod-subtle, rgb(255 255 255 / 4%));
+    color: var(--text-default, #dbdee1);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.vc-glance-preset-chip:hover {
+    background: var(--background-mod-strong, rgb(255 255 255 / 8%));
+}
+
+.vc-glance-preset-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 25%);
+}
+
 .vc-glance-customize-colors {
     flex-direction: row;
     gap: 16px;
@@ -3084,7 +3178,8 @@ body.vc-glance-dragging .vc-glance-card:hover {
    ======================================================================== */
 
 .vc-glance-on-light .vc-glance-card,
-.vc-glance-on-light .vc-glance-hero {
+.vc-glance-on-light .vc-glance-hero,
+.vc-glance-on-light .vc-glance-hero-notifs {
     background: rgb(255 255 255 / 52%);
     border-color: rgb(0 0 0 / 8%);
 }
@@ -3289,4 +3384,26 @@ body.vc-glance-dragging .vc-glance-card:hover {
 
 .vc-glance-orion-task-done .vc-glance-orion-fill {
     background: var(--status-positive, #23a55a);
+}
+
+/* ========== Reduced motion: global catch-all ==========
+   The selectors above already gate their specific animations/transitions per
+   component. This is belt-and-suspenders coverage for anything nested under
+   the plugin's layer or popup backdrop that isn't individually scoped above
+   (e.g. .vc-glance-orion-fill's width transition). */
+@media (prefers-reduced-motion: reduce) {
+    .vc-glance-layer *,
+    .vc-glance-popup-backdrop * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+
+    /* These roots portal to document.body, so the descendant selectors above
+       can't reach them; gate their own entry animations directly. (The command
+       palette is already gated near its own rules.) */
+    .vc-glance-dropdown-menu,
+    .vc-glance-popup-backdrop {
+        animation: none !important;
+    }
 }
